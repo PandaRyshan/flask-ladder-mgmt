@@ -1,25 +1,17 @@
-# PandaToys
+# Ladder-Dashboard
 
-It's a flask starter project, like a toy. I'm trying to learn python in actions.
+This is a dashboard for ladder management. Includes user management, VPS management and notification push features.
 
 ---
 
 ## Usage
 
-1. create `.env` in root dir and put your environment in it:
+---
 
-   ```shell
-   cd 
-   cp .env.template .env
-   ```
+## TODO
 
-2. start project from shell:
+[ ] Slack notification
+[ ] Teams notification
+[ ] Integration with Ansible
+[ ] Ladder user management
 
-   ```shell
-   # install dependencies. you could install pytest with `pip install -e .[dev, test]`
-   pip install -e .
-
-   # init db file, use --drop to drop all tables
-   flask init-db
-   flask run
-   ```
