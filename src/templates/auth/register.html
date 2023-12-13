@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registration Page</title>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  /* Additional styles to match the design */
+  body {
+    background-color: #F0F2F5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .card {
+    width: 400px; /* Adjust width as needed */
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-body">
+    <h3 class="card-title text-center">DASHBOARD</h3>
+    <p class="text-muted text-center">Create an account...</p>
+    <form>
+      <div class="form-group">
+        <input type="invitecode" class="form-control" placeholder="Invite Code">
+      </div>
+      <div class="form-group">
+        <input type="name" class="form-control" placeholder="Name">
+      </div>
+      <div class="form-group">
+        <input type="email" class="form-control" placeholder="Email Address">
+      </div>
+      <!--
+      <div class="form-group">
+        <input type="tel" class="form-control" placeholder="Phone Number">
+      </div>
+      <div class="from-group">
+        <label for="find-us">How did you find us?</label>
+        <select class="form-control" id="find-us">
+          <option>None</option>
+        </select>
+      </div>
+      -->
+      <div class="form-group">
+        <input type="password" class="form-control" placeholder="Password">
+        <input type="password" class="form-control" placeholder="Confirm Password">
+      </div>
+      <div class="form-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="terms">
+          <label class="form-check-label" for="terms">
+            I have read and agree to the <a href="#">Terms of Service</a>
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Register</button>
+      <p class="text-center">Already have an account? <a href="/login">Sign In</a></p>
+    </form>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  // post register form
+  $(function() {
+    $('form').submit(function(e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '/register',
+        data: $('form').serialize(),
+        success: function() {
+          alert('success');
+        }
+      });
+    });
+  });
+</body>
+</html>
