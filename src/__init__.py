@@ -1,4 +1,5 @@
 import os
+from src import config
 
 from logger import LoggerConfigurator
 from flask import Flask, redirect,  url_for
@@ -13,33 +14,18 @@ def create_app(test_config=None):
 
     """Create and configure an instance of the Flask application."""
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-        # a default secret that should be overridden by instance config
-        SECRET_KEY = os.environ['SECRET_KEY'],
-        SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI'],
-        # set optional bootswatch theme
-        FLASK_ADMIN_SWATCH = 'cerulean',
-        
-        # flask-security
-        SECURITY_PASSWORD_SALT = os.environ['SECURITY_PASSWORD_SALT'],
-        SECURITY_PASSWORD_HASH = os.environ['SECURITY_PASSWORD_HASH'],
-        SECURITY_REGISTERABLE = True,
 
-        # flask-mail
-        MAIL_SERVER = os.environ['MAIL_SERVER'],
-        MAIL_PORT = os.environ['MAIL_PORT'],
-        MAIL_USE_TLS = os.environ['MAIL_USE_TLS'],
-        MAIL_USE_SSL = os.environ['MAIL_USE_SSL'],
-        MAIL_USERNAME = os.environ['MAIL_USERNAME'],
-        MAIL_PASSWORD = os.environ['MAIL_PASSWORD'],
-        MAIL_DEFAULT_SENDER = os.environ['MAIL_DEFAULT_SENDER'],
-    )
+    CSRFProtect(app)
 
-    csrf = CSRFProtect(app)
-
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
+    if not test_config:
+        # load the instance .env
+        match os.environ['FLASK_ENV']:
+            case 'prod':
+                app.config.from_object(config.ProductionConfig)
+            case 'test':
+                app.config.from_object(config.TestingConfig)
+            case 'dev':
+                app.config.from_object(config.DevelopmentConfig)
     else:
         # load the test config if passed in
         app.config.update(test_config)
