@@ -2,7 +2,7 @@ import os
 
 
 class BaseConfig(object):
-    DEBUG = False
+    FLASK_DEBUG = False
     TESTING = False
     FLASK_ENV = os.environ['FLASK_ENV']
     # make sure all security config are overriden in production
@@ -27,7 +27,7 @@ class BaseConfig(object):
 
 
 class DevelopmentConfig(BaseConfig):
-    DEBUG = True
+    FLASK_DEBUG = True
 
 
 class TestingConfig(BaseConfig):

@@ -1,11 +1,11 @@
 import os
-from src import config
 
-from logger import LoggerConfigurator
 from flask import Flask, redirect,  url_for
 from flask.cli import load_dotenv
 from flask_login import login_required
 from flask_wtf.csrf import CSRFProtect
+from src import config
+from logger import LoggerConfigurator
 
 
 def create_app(test_config=None):
@@ -15,6 +15,7 @@ def create_app(test_config=None):
     """Create and configure an instance of the Flask application."""
     app = Flask(__name__, instance_relative_config=True)
 
+    # csrf protection
     CSRFProtect(app)
 
     if not test_config:
