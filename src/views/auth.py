@@ -5,6 +5,7 @@ from src.models.user import User
 from werkzeug.security import check_password_hash, generate_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from src.utils.mail import send_mail
+from src.forms.registration_form import RegistrationForm
 
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -22,29 +23,20 @@ def load_user(user_id):
 
 @bp.route("/register", methods=["GET", "POST"], endpoint="register")
 def register():
-    if request.method == "POST":
-        # username = request.form.get("username")
-        password = request.form.get("password")
-        email = request.form.get("email")
-        name = request.form.get("name")
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        password = form.password.data
+        email = form.email.data
+        user_name = email
+        name = form.name.data
 
         error = None
 
-        # if not username:
-        #     error = "Username is required."
-        if not password:
-            error = "Password is required."
-        elif not email:
-            error = "Email is required."
-        elif not name:
-            error = "Name is required."
-        # elif User.query.filter_by(username=username).first() is not None:
-        #     error = f"User {username} is already registered."
-        elif User.query.filter_by(email=email).first() is not None:
+        if User.query.filter_by(email=email).first() is not None:
             error = f"Email {email} is already registered."
         
         if error is None:
-            user = User(password=generate_password_hash(password), email=email, name=name)
+            user = User(password=generate_password_hash(password), user_name=user_name, email=email, name=name)
             db.session.add(user)
             db.session.commit()
             return redirect(url_for("auth.login"))
@@ -58,7 +50,7 @@ def register():
         send_mail(email, "Confirm Your Email Address", "mail/confirm", confirm_url=confirm_url)
         return render_template("auth/register_finish.html")
     
-    return render_template("auth/register.html")
+    return render_template("auth/register.html", form=form)
 
 
 @bp.route("/login", methods=["GET", "POST"], endpoint="login")

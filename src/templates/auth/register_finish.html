@@ -5,34 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login Page</title>
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-<style>
-  /* Additional styles to match the design */
-  body {
-    background-color: #F0F2F5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-  }
-  .card {
-    width: 400px; /* Adjust width as needed */
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  .social-btn {
-    text-align: center;
-  }
-  .social-btn .btn {
-    margin: 5px;
-  }
-  .form-check-label {
-    margin-left: 5px;
-  }
-  .forgot-password {
-    float: right;
-  }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 

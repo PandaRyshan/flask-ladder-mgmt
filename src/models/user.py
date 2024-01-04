@@ -1,19 +1,16 @@
-from flask_security import UserMixin, RoleMixin
+from flask_security import UserMixin
 from src.utils.db import db
+from src.models.role import Role
+from src.models.user_roles import UserRoles
 
-
-class Role(db.Model, RoleMixin):
-    id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
-    name = db.Column(db.String(80), unique=True)
-    
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
     user_name = db.Column(db.String(30), unique=True, nullable=False)
     password = db.Column(db.String(255))
-    email = db.Column(db.String(30), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
     name = db.Column(db.String(80), nullable=False)
     active = db.Column(db.Boolean(), default=False)
-    roles = db.relationship('Role', secondary='user_roles',
-                            backref=db.backref('users', lazy='dynamic'))
+    roles = db.relationship('Role', secondary=UserRoles.__tablename__,
+                            backref=db.backref('user', lazy='dynamic'))
     fs_uniquifier = db.Column(db.String, nullable=False, unique=True)

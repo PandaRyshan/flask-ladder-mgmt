@@ -1,0 +1,52 @@
+/* Additional styles to match the design */
+body {
+    background-color: #F0F2F5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.card {
+    width: 400px; /* Adjust width as needed */
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+#messageModal .modal-dialog {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 60px);
+}
+@media (max-width: 576px) {
+    #messageModal .modal-dialog {
+        min-height: 100vh;
+    }
+}
+
+.social-btn {
+    text-align: center;
+}
+.social-btn .btn {
+    margin: 5px;
+}
+.form-check-label {
+    margin-left: 5px;
+}
+.forgot-password {
+    float: right;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+}
+}
+
+.modal-dialog {
+    /* 应用动画 */
+    animation-name: slideUp;
+    animation-duration: 0.4s; /* 动画持续时间 */
+}

@@ -4,6 +4,7 @@ from logger import LoggerConfigurator
 from flask import Flask, redirect,  url_for
 from flask.cli import load_dotenv
 from flask_login import login_required
+from flask_wtf.csrf import CSRFProtect
 
 
 def create_app(test_config=None):
@@ -33,6 +34,8 @@ def create_app(test_config=None):
         MAIL_PASSWORD = os.environ['MAIL_PASSWORD'],
         MAIL_DEFAULT_SENDER = os.environ['MAIL_DEFAULT_SENDER'],
     )
+
+    csrf = CSRFProtect(app)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing

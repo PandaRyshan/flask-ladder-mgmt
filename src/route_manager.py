@@ -1,6 +1,7 @@
 from flask_admin import Admin
 from flask_security import Security, SQLAlchemyUserDatastore
-from src.models.user import User, Role
+from src.models.user import User
+from src.models.role import Role
 from src.views.user import bp as user_bp
 from src.views.auth import bp as auth_bp
 from src.views.admin import VPNAdminIndexView, AuthModeView
