@@ -11,6 +11,12 @@ def init_app(app):
     db.init_app(app)
     app.cli.add_command(init_db_command)
 
+    @app.teardown_request
+    def session_commit(exception=None):
+        if exception:
+            db.session.rollback()
+        db.session.commit()
+
 
 @click.command("init-db")
 @click.option("--drop", is_flag=True, help="Create after drop.")

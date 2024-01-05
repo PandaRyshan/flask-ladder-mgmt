@@ -1,11 +1,16 @@
-from src.utils.db import db
-from flask import Blueprint, g, redirect, render_template, request, session, url_for, flash, current_app
+import uuid
+
+from flask import Blueprint, g, redirect, render_template, request, session, \
+    url_for, flash, current_app, jsonify
 from flask_login import LoginManager
-from src.models.user import User
+from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import check_password_hash, generate_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+from src.models.user import User, Role
+from src.utils.db import db
 from src.utils.mail import send_mail
 from src.forms.registration_form import RegistrationForm
+from src.views.contants import RoleEnum
 
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -21,36 +26,59 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-@bp.route("/register", methods=["GET", "POST"], endpoint="register")
+@bp.route("/signup", methods=["GET", "POST"], endpoint="signup")
 def register():
+    print("-------------- START --------------")
     form = RegistrationForm()
-    if form.validate_on_submit():
-        password = form.password.data
-        email = form.email.data
-        user_name = email
-        name = form.name.data
+    print(form.data)
+    if request.method == "POST":
+        if form.validate_on_submit():
+            print("----------------- NO ERROR -----------------")
 
-        error = None
+            error = None
 
-        if User.query.filter_by(email=email).first() is not None:
-            error = f"Email {email} is already registered."
-        
-        if error is None:
-            user = User(password=generate_password_hash(password), user_name=user_name, email=email, name=name)
+            # TODO: make a exception handler
+            # TODO: replace user exist check via redis cache
+            if User.query.filter_by(email=form.email.data).first() is not None:
+                error = f"Email {form.email.data} is already registered."
+                return jsonify({"error": [error]}), 400
+            
+            print("------------------ Start to register -------------------")
+            user = User(
+                password=generate_password_hash(form.password.data),
+                user_name=form.email.data,
+                email=form.email.data,
+                name=form.name.data,
+                active=False,
+                roles=[Role.query.filter_by(id=RoleEnum.USER.value).first()],
+                fs_uniquifier=uuid.uuid4().hex
+            )
             db.session.add(user)
-            db.session.commit()
-            return redirect(url_for("auth.login"))
 
-        flash(error)
+            token = generate_confirmation_token(
+                form.email.data,
+                current_app.config["SECRET_KEY"],
+                current_app.config["SECURITY_PASSWORD_SALT"]
+            )
+            confirm_url = url_for("auth.confirm", token=token, _external=True)
+            print(confirm_url)
+            # TODO: make a email template
+            # send_mail(email, "Confirm Your Email Address", "mail.confirm", confirm_url=confirm_url)
+            return render_template("auth.finish")
+        else:
+            print("----------------- ERROR -----------------")
+            print(form.errors)
+            return jsonify(form.errors), 400
 
-        token = generate_confirmation_token(email,
-                                            current_app.config["SECRET_KEY"],
-                                            current_app.config["SECURITY_PASSWORD_SALT"])
-        confirm_url = url_for("confirm", token=token, _external=True)
-        send_mail(email, "Confirm Your Email Address", "mail/confirm", confirm_url=confirm_url)
-        return render_template("auth/register_finish.html")
-    
-    return render_template("auth/register.html", form=form)
+    return render_template("auth/signup.html", form=form)
+
+
+@bp.route("/signup/finish", methods=["GET"], endpoint="finish")
+def finish():
+    referrer = request.referrer
+    if referrer is None or not referrer.startswith(request.host_url):
+        return redirect(url_for("index"))
+    return render_template("auth/signup_finish.html")
 
 
 @bp.route("/login", methods=["GET", "POST"], endpoint="login")
