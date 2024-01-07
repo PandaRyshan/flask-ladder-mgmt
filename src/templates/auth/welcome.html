@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  Welcome! You have finished the verification, start <a src="{{ url_for('login') }}">to Login!</a>
+</div>
+
+{% endblock %}

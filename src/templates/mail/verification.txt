@@ -1,0 +1,8 @@
+Hello {{ name }},
+
+Please click the following link to verify your account:
+
+{{ verification_url }}
+
+Thank you,
+Your Team

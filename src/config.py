@@ -15,11 +15,14 @@ class BaseConfig(object):
     # flask-mail
     MAIL_SERVER = os.environ['MAIL_SERVER']
     MAIL_PORT = os.environ['MAIL_PORT']
+    # You should only set one of MAIL_USE_TLS or MAIL_USE_SSL in the env
     MAIL_USE_TLS = os.environ['MAIL_USE_TLS']
-    MAIL_USE_SSL = os.environ['MAIL_USE_SSL']
+    # MAIL_USE_SSL = os.environ['MAIL_USE_SSL']
     MAIL_USERNAME = os.environ['MAIL_USERNAME']
     MAIL_PASSWORD = os.environ['MAIL_PASSWORD']
     MAIL_DEFAULT_SENDER = os.environ['MAIL_DEFAULT_SENDER']
+    MAIL_MAX_MAILS=os.environ['MAIL_MAX_MAILS']
+    MAIL_DEBUG=os.environ['FLASK_DEBUG']
     # flask admin theme
     FLASK_ADMIN_SWATCH = 'cerulean'
     # log path

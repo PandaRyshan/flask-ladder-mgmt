@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Verification{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  {% if verification_result == 'valid' %}
+    Welcome! Your email address has been verified. <a href="/login">Login Now.</a>
+  {% elif verification_result == 'invalid' %}
+    Sorry, this link you used is invalid.
+  {% else %}
+    Almost there, you need to verify your email address. Please check your email for the verification link.
+  {% endif %}
+</div>
+
+{% endblock %}

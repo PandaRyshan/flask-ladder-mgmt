@@ -3,10 +3,10 @@ import uuid
 from flask import Blueprint, g, redirect, render_template, request, session, \
     url_for, flash, current_app, jsonify
 from flask_login import LoginManager
-from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import check_password_hash, generate_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
-from src.models.user import User, Role
+from src.models.user import User
+from src.models.role import Role
 from src.utils.db import db
 from src.utils.mail import send_mail
 from src.forms.registration_form import RegistrationForm
@@ -28,22 +28,14 @@ def load_user(user_id):
 
 @bp.route("/signup", methods=["GET", "POST"], endpoint="signup")
 def register():
-    print("-------------- START --------------")
     form = RegistrationForm()
-    print(form.data)
     if request.method == "POST":
         if form.validate_on_submit():
-            print("----------------- NO ERROR -----------------")
-
-            error = None
-
             # TODO: make a exception handler
-            # TODO: replace user exist check via redis cache
             if User.query.filter_by(email=form.email.data).first() is not None:
                 error = f"Email {form.email.data} is already registered."
                 return jsonify({"error": [error]}), 400
             
-            print("------------------ Start to register -------------------")
             user = User(
                 password=generate_password_hash(form.password.data),
                 user_name=form.email.data,
@@ -60,25 +52,51 @@ def register():
                 current_app.config["SECRET_KEY"],
                 current_app.config["SECURITY_PASSWORD_SALT"]
             )
-            confirm_url = url_for("auth.confirm", token=token, _external=True)
-            print(confirm_url)
-            # TODO: make a email template
-            # send_mail(email, "Confirm Your Email Address", "mail.confirm", confirm_url=confirm_url)
-            return render_template("auth.finish")
+            verification_url = url_for("auth.signup_verify", safe_token=token, _external=True)
+            send_mail(
+                to=form.email.data,
+                subject="Verify Your Email Address",
+                template="mail/verification",
+                verification_url=verification_url,
+                name=form.name.data
+            )
+            return jsonify({"next_url": url_for("auth.signup_pending")})
         else:
-            print("----------------- ERROR -----------------")
             print(form.errors)
             return jsonify(form.errors), 400
 
     return render_template("auth/signup.html", form=form)
 
 
-@bp.route("/signup/finish", methods=["GET"], endpoint="finish")
-def finish():
+@bp.route("/signup/pending", methods=["GET"], endpoint="signup_pending")
+def signup_pending():
     referrer = request.referrer
     if referrer is None or not referrer.startswith(request.host_url):
         return redirect(url_for("index"))
-    return render_template("auth/signup_finish.html")
+    return render_template("auth/verification.html")
+
+
+@bp.route("/signup/verify/<safe_token>", methods=["GET"], endpoint="signup_verify")
+def verify_account(safe_token=None):
+    if safe_token:
+        secret_key = current_app.config["SECRET_KEY"]
+        salt = current_app.config["SECURITY_PASSWORD_SALT"]
+        email = verify_token(safe_token, secret_key, salt)
+
+        # invalid token
+        if not email:
+            return render_template("auth/verification.html", verification_result="invalid")
+
+        user = User.query.filter_by(email=email).first()
+        if user.active:
+            return render_template("auth/verification.html", verification_result="invalid")
+        else:
+            # active user account
+            user.active = True
+            db.session.add(user)
+            return render_template("auth/verification.html", verification_result="valid")
+
+    return redirect(url_for("index"))
 
 
 @bp.route("/login", methods=["GET", "POST"], endpoint="login")
@@ -111,11 +129,10 @@ def logout():
 
 @bp.route("/reset", methods=["GET", "POST"], endpoint="reset")
 def reset():
+    # TODO: implement reset password
     if request.method == "POST":
         email = request.form.get("email")
-
         error = None
-
         user = User.query.filter_by(email=email).first()
 
 
@@ -124,11 +141,10 @@ def generate_confirmation_token(email, secret_key, salt):
     return serializer.dumps(email, salt=salt)
 
 
-@bp.route("/confirm/<token>", methods=["GET"], endpoint="confirm")
-def confirm_token(token, secret_key, salt, expiration=3600):
+def verify_token(saved_token, secret_key, salt, expiration=10800):
     serializer = URLSafeTimedSerializer(secret_key)
     try:
-        email = serializer.loads(token, salt=salt, max_age=expiration)
+        email = serializer.loads(saved_token, salt=salt, max_age=expiration)
     except SignatureExpired:
         return False
     return email

@@ -83,10 +83,10 @@
         formDataArray.map(item => [item.name, item.value])
       );
 
-      // if ($('#terms').is(':checked') == false) {
-      //   showMessage('Error', 'Please accept terms and conditions.');
-      //   return;
-      // }
+      if ($('#terms').is(':checked') == false) {
+        showMessage('Error', 'Please accept terms and conditions.');
+        return;
+      }
 
       if (!formData.inviteCode) {
         showMessage('Error', 'Please enter invite code.');
@@ -104,25 +104,34 @@
       }
 
       $.ajax({
-        url: 'register',
+        url: 'signup',
         type: 'POST',
         data: formData,
         success: function(data) {
           Overlay.hide();
           showMessage('Success', 'Your account has been created successfully. Please check the confirmation email and verify your account.');
+          setTimeout(function() {
+            window.location.href = data.next_url;
+          }, 3000);
         },
         error: function(error) {
           Overlay.hide();
           console.log('Error', error);
-          var errors = error.responseJSON;
-          var messages = Object.values(errors).map(function(item) {
-            if (Array.isArray(item)) {
-              return item.join('\n');
-            } else {
-              return item;
-            }
-          })
-          showMessage('Error', messages);
+          if (error.responseJSON) {
+            var errors = error.responseJSON;
+            var messages = Object.values(errors).map(function(item) {
+              if (Array.isArray(item)) {
+                return item.join('\n');
+              } else {
+                return item;
+              }
+            })
+            showMessage('Error', messages);
+          } else if (error.responseText && error.responseText.includes('expired')) {
+            showMessage('Error', 'The page is expired. Please refresh and try again.');
+          } else {
+            showMessage('Error', 'Something went wrong. Please try again later or contact us.');
+          }
         }
       });
     });
