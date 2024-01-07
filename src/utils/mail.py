@@ -1,5 +1,6 @@
-from flask_mail import Mail, Message
-from flask import current_app, render_template
+from flask import render_template
+from flask_mailman import Mail, EmailMultiAlternatives
+# from flask_mail import Mail, Message
 
 
 mail = Mail()
@@ -10,8 +11,24 @@ def init_mail(app):
 
 
 def send_mail(to, subject, template, **kwargs):
-    msg = Message(subject, recipients=[to], 
-                  sender=current_app.config["MAIL_USERNAME"])
-    msg.body = render_template(template + ".txt", **kwargs)
-    msg.html = render_template(template + ".html", **kwargs)
-    mail.send(msg)
+    text_content = render_template(f"{template}.txt", **kwargs)              
+    html_content = render_template(f"{template}.html", **kwargs)
+    print(f"TEXT CONTENT: {text_content}")
+    print(f"HTML CONTENT: {html_content}")
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        to=[to],
+        body=text_content
+    )
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+    # flask_email2 usage
+    # msg = Message(
+    #     subject=subject,
+    #     recipients=[to],
+    #     body=text_content,
+    #     html=html_content,
+    #     sender=('PandasRun', 'noreply@pandas.run')
+    # )
+    # mail.send(msg)
