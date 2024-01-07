@@ -10,10 +10,10 @@ This is a dashboard for ladder management. Includes user management, VPS managem
 
 ## TODO
 
-[x] User management
+- [x] User management
 
-[ ] Ladder management
+- [ ] Ladder management
 
-[ ] Notification
+- [ ] Notification
 
-[ ] Server auto upgrade
+- [ ] Server auto upgrade
