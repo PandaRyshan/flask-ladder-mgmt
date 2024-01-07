@@ -10,8 +10,10 @@ This is a dashboard for ladder management. Includes user management, VPS managem
 
 ## TODO
 
-[ ] Slack notification
-[ ] Teams notification
-[ ] Integration with Ansible
-[ ] Ladder user management
+[x] User management
 
+[ ] Ladder management
+
+[ ] Notification
+
+[ ] Server auto upgrade
