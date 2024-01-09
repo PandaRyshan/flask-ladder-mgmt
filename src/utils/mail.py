@@ -1,6 +1,7 @@
 from flask import render_template
 from flask_mailman import Mail, EmailMultiAlternatives
 # from flask_mail import Mail, Message
+from celery import shared_task
 
 
 mail = Mail()
@@ -10,6 +11,7 @@ def init_mail(app):
     mail.init_app(app)
 
 
+@shared_task(name="send_mail", max_retries=3, default_retry_delay=60)
 def send_mail(to, subject, template, **kwargs):
     text_content = render_template(f"{template}.txt", **kwargs)              
     html_content = render_template(f"{template}.html", **kwargs)

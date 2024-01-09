@@ -1,6 +1,6 @@
 import uuid
 
-from flask import Blueprint, g, redirect, render_template, request, session, \
+from flask import Blueprint, redirect, render_template, request, session, \
     url_for, flash, current_app, jsonify
 from flask_login import LoginManager
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -8,7 +8,9 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from src.models.user import User
 from src.models.role import Role
 from src.utils.db import db
-from src.utils.mail import send_mail
+from src.utils.celery import celery
+# from src.utils.mail import send_mail
+from src.tasks.mail_tasks import send_mail
 from src.forms.registration_form import RegistrationForm
 from src.views.contants import RoleEnum
 
@@ -31,14 +33,9 @@ def register():
     form = RegistrationForm()
     if request.method == "POST":
         if form.validate_on_submit():
-            # TODO: make a exception handler
-            if User.query.filter_by(email=form.email.data).first() is not None:
-                error = f"Email {form.email.data} is already registered."
-                return jsonify({"error": [error]}), 400
-            
             user = User(
                 password=generate_password_hash(form.password.data),
-                user_name=form.email.data,
+                username=form.email.data,
                 email=form.email.data,
                 name=form.name.data,
                 active=False,
@@ -47,13 +44,11 @@ def register():
             )
             db.session.add(user)
 
-            token = generate_confirmation_token(
-                form.email.data,
-                current_app.config["SECRET_KEY"],
-                current_app.config["SECURITY_PASSWORD_SALT"]
-            )
+            token = generate_verification_token(form.email.data)
             verification_url = url_for("auth.signup_verify", safe_token=token, _external=True)
-            send_mail(
+            print(celery.conf["broker_url"])
+            print(celery.conf["result_backend"])
+            send_mail.delay(
                 to=form.email.data,
                 subject="Verify Your Email Address",
                 template="mail/verification",
@@ -79,9 +74,7 @@ def signup_pending():
 @bp.route("/signup/verify/<safe_token>", methods=["GET"], endpoint="signup_verify")
 def verify_account(safe_token=None):
     if safe_token:
-        secret_key = current_app.config["SECRET_KEY"]
-        salt = current_app.config["SECURITY_PASSWORD_SALT"]
-        email = verify_token(safe_token, secret_key, salt)
+        email = verify_token(safe_token)
 
         # invalid token
         if not email:
@@ -101,6 +94,7 @@ def verify_account(safe_token=None):
 
 @bp.route("/login", methods=["GET", "POST"], endpoint="login")
 def login():
+    # TODO: add flask-session and redis
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
@@ -128,20 +122,27 @@ def logout():
 
 
 @bp.route("/reset", methods=["GET", "POST"], endpoint="reset")
+@bp.route("/reset/<safe_token>", methods=["GET", "POST"], endpoint="reset")
 def reset():
     # TODO: implement reset password
     if request.method == "POST":
         email = request.form.get("email")
-        error = None
-        user = User.query.filter_by(email=email).first()
+        # user = User.query.filter_by(email=email).first()
+        token = generate_verification_token(email)
+    
+    return render_template("auth/reset.html")
 
 
-def generate_confirmation_token(email, secret_key, salt):
+def generate_verification_token(email):
+    secret_key = current_app.config["SECRET_KEY"]
+    salt = current_app.config["SECURITY_PASSWORD_SALT"]
     serializer = URLSafeTimedSerializer(secret_key)
     return serializer.dumps(email, salt=salt)
 
 
-def verify_token(saved_token, secret_key, salt, expiration=10800):
+def verify_token(saved_token, expiration=10800):
+    secret_key = current_app.config["SECRET_KEY"]
+    salt = current_app.config["SECURITY_PASSWORD_SALT"]
     serializer = URLSafeTimedSerializer(secret_key)
     try:
         email = serializer.loads(saved_token, salt=salt, max_age=expiration)

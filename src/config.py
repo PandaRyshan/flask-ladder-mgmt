@@ -21,8 +21,13 @@ class BaseConfig(object):
     MAIL_USERNAME = os.environ['MAIL_USERNAME']
     MAIL_PASSWORD = os.environ['MAIL_PASSWORD']
     MAIL_DEFAULT_SENDER = os.environ['MAIL_DEFAULT_SENDER']
-    MAIL_MAX_MAILS=os.environ['MAIL_MAX_MAILS']
-    MAIL_DEBUG=os.environ['FLASK_DEBUG']
+    MAIL_MAX_MAILS = os.environ['MAIL_MAX_MAILS']
+    MAIL_DEBUG = os.environ['FLASK_DEBUG']
+    # celery
+    CELERY = {
+        "broker_url": os.environ['CELERY_BROKER_URL'],
+        "result_backend": os.environ['CELERY_RESULT_BACKEND']
+    }
     # flask admin theme
     FLASK_ADMIN_SWATCH = 'cerulean'
     # log path

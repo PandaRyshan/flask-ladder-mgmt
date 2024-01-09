@@ -11,9 +11,9 @@ This is a dashboard for ladder management. Includes user management, VPS managem
 ## TODO
 
 - [x] User management
-
+  - [ ] Reset password
 - [ ] Ladder management
-
+  - [ ] Ladder account management
+  - [ ] Client download
 - [ ] Notification
-
 - [ ] Server auto upgrade

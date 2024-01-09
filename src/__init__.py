@@ -35,6 +35,13 @@ def create_app(test_config=None):
     # logging configuration
     LoggerConfigurator.setup_app_logger(app)
 
+    # mail
+    from src.utils.mail import init_mail
+    init_mail(app)
+
+    # task queue
+    from src.utils.celery import init_celery
+    init_celery(app)
 
     @app.route("/index")
     @app.route("/", endpoint='index')
@@ -42,9 +49,9 @@ def create_app(test_config=None):
     def hello():
         return redirect(url_for("user.dashboard"))
 
-    @app.route("/register", methods=["GET"], endpoint="register")
+    @app.route("/signup", methods=["GET"], endpoint="signup")
     def register():
-        return redirect(url_for("auth.register"))
+        return redirect(url_for("auth.signup"))
 
     @app.route("/login", methods=["GET"], endpoint="login")
     def login():
@@ -63,8 +70,5 @@ def create_app(test_config=None):
 
     from src.views.auth import login_manager
     login_manager.init_app(app)
-
-    from src.utils.mail import init_mail
-    init_mail(app)
 
     return app

@@ -70,6 +70,7 @@
       $('#messageModal .modal-title').text(title);
       $('#messageContent').text(message);
       $('#messageModal').modal('show');
+      Overlay.hide();
     }
 
     $('#signup-form').submit(function(e) {
@@ -110,9 +111,9 @@
         success: function(data) {
           Overlay.hide();
           showMessage('Success', 'Your account has been created successfully. Please check the confirmation email and verify your account.');
-          setTimeout(function() {
-            window.location.href = data.next_url;
-          }, 3000);
+          // setTimeout(function() {
+          //   window.location.href = data.next_url;
+          // }, 3000);
         },
         error: function(error) {
           Overlay.hide();

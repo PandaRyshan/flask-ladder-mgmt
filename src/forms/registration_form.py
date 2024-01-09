@@ -1,10 +1,45 @@
+from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, validators
+from src.models.verification_codes import VerificationCode
+from src.models.user import User
 
 
 class RegistrationForm(FlaskForm):
-    invite_code = StringField("Invite Code", [validators.DataRequired()], name="inviteCode")
-    email = StringField("Email", [validators.DataRequired(), validators.Email()])
+
+    def validate_invite_code(form, field):
+        """
+        Validate invite code, check if it exists in the database.
+        And this validator will be called after all other validators.
+
+        Raises:
+            validators.ValidationError: This error won't stop other validators.
+        """
+        code = VerificationCode.query.filter_by(code=field.data).first()
+        if code is None:
+            raise validators.ValidationError("Invalid invite code.")
+        if code.used:
+            raise validators.ValidationError("Invite code has been used.")
+        if code.expires_at < datetime.utcnow():
+            raise validators.ValidationError("Invite code has expired.")
+        
+
+    def validate_email(form, field):
+        """
+        Validate email, check if it exists in the database.
+        And this validator will be called after all other validators.
+
+        Raises:
+            validators.ValidationError: This error won't stop other validators.
+        """
+        if User.query.filter_by(email=field.data).first() is not None:
+            raise validators.ValidationError("Email is already registered.")
+
+
+    invite_code = StringField(
+        "Invite Code", [validators.DataRequired()], name="inviteCode")
+    email = StringField(
+        "Email", [validators.DataRequired(), validators.Email()])
     name = StringField("Name", [validators.DataRequired()])
     password = PasswordField("Password", validators=[
         validators.DataRequired(),
@@ -19,3 +54,4 @@ class RegistrationForm(FlaskForm):
         validators.EqualTo("password", message="Passwords must match"),
         ], name="confirmPassword"
     )
+
