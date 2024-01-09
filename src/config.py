@@ -44,3 +44,4 @@ class TestingConfig(BaseConfig):
 
 class ProductionConfig(BaseConfig):
     LOG_PATH = '/var/log/vpn_admin/app.log'
+    SERVER_NAME = os.environ['SERVER_NAME']

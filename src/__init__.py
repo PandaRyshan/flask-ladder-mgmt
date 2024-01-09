@@ -21,11 +21,11 @@ def create_app(test_config=None):
     if not test_config:
         # load the instance .env
         match os.environ['FLASK_ENV']:
-            case 'prod':
+            case 'production':
                 app.config.from_object(config.ProductionConfig)
-            case 'test':
+            case 'testing':
                 app.config.from_object(config.TestingConfig)
-            case 'dev':
+            case 'development':
                 app.config.from_object(config.DevelopmentConfig)
     else:
         # load the test config if passed in
