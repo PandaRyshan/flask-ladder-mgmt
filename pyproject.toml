@@ -52,5 +52,6 @@ docs = ["sphinx"]
 testpaths = ["tests"]
 
 [tool.ruff]
+src = ["src"]
 line-length = 100
 ignore = ["E115"]
