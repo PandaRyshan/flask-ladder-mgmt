@@ -4,8 +4,6 @@ from flask import Flask, redirect,  url_for
 from flask.cli import load_dotenv
 from flask_login import login_required
 from flask_wtf.csrf import CSRFProtect
-from src import config
-from logger import LoggerConfigurator
 
 
 def create_app(test_config=None):
@@ -19,6 +17,7 @@ def create_app(test_config=None):
     csrf = CSRFProtect()
     csrf.init_app(app)
 
+    from src import config
     if not test_config:
         # load the instance .env
         match os.environ['FLASK_ENV']:
@@ -33,15 +32,20 @@ def create_app(test_config=None):
         app.config.update(test_config)
 
     # logging configuration
+    from logger import LoggerConfigurator
     LoggerConfigurator.setup_app_logger(app)
 
-    # mail
-    from src.utils.mail import init_mail
-    init_mail(app)
+    # register the database commands (sqlalchemy)
+    from src.utils import db
+    db.init_app(app)
 
-    # task queue
-    from src.utils.celery import init_celery
-    init_celery(app)
+    from src.views.auth import login_manager
+    login_manager.init_app(app)
+
+    # mail
+    from src.utils import mail, celery
+    mail.init_mail(app)
+    celery.init_celery(app)
 
     @app.route("/index")
     @app.route("/", endpoint='index')
@@ -57,18 +61,11 @@ def create_app(test_config=None):
     def login():
         return redirect(url_for("auth.login"))
 
-    # register the database commands (sqlalchemy)
-    from src.utils import db
-    db.init_app(app)
-
     from src.route_manager import RouteManager
     
     # register flask admin & blueprint
     RouteManager.register_admin(app)
     RouteManager.register_security(app, db.db)
     RouteManager.register_routes(app)
-
-    from src.views.auth import login_manager
-    login_manager.init_app(app)
 
     return app

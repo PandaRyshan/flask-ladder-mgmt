@@ -9,8 +9,7 @@ from src.models.user import User
 from src.models.role import Role
 from src.utils.db import db
 from src.utils.celery import celery
-# from src.utils.mail import send_mail
-from src.tasks.mail_tasks import send_mail
+from src.utils.mail import send_mail
 from src.forms.registration_form import RegistrationForm
 from src.views.contants import RoleEnum
 
@@ -126,9 +125,10 @@ def logout():
 def reset():
     # TODO: implement reset password
     if request.method == "POST":
-        email = request.form.get("email")
+        # email = request.form.get("email")
         # user = User.query.filter_by(email=email).first()
-        token = generate_verification_token(email)
+        # token = generate_verification_token(email)
+        pass
     
     return render_template("auth/reset.html")
 

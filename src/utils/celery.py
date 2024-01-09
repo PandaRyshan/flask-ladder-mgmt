@@ -9,14 +9,13 @@ def init_celery(app: Flask) -> Celery:
     class FlaskTask(Task):
         def __call__(self, *args: object, **kwargs: object) -> object:
             with app.app_context():
-                return self.run(self, *args, **kwargs)
-    # celery = Celery(app.name, task_cls=FlaskTask)
+                return self.run(*args, **kwargs)
     celery.conf.update(
         main=app.name,
         task_cls=FlaskTask,
     )
     celery.config_from_object(app.config["CELERY"])
     celery.set_default()
-    # celery.autodiscover_tasks(["src.tasks"])
     app.extensions["celery"] = celery
+    celery.Task = FlaskTask
     return celery
