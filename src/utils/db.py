@@ -7,7 +7,7 @@ from flask.cli import with_appcontext
 db = SQLAlchemy()
 
 
-def init_app(app):
+def init_db(app):
     db.init_app(app)
     app.cli.add_command(init_db_command)
 

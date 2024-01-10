@@ -8,9 +8,8 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from src.models.user import User
 from src.models.role import Role
 from src.utils.db import db
-from src.utils.celery import celery
 from src.utils.mail import send_mail
-from src.forms.registration_form import RegistrationForm
+from src.forms.signup_form import SignupForm
 from src.views.contants import RoleEnum
 
 
@@ -27,9 +26,9 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-@bp.route("/signup", methods=["GET", "POST"], endpoint="signup")
+@bp.route("/signup/", methods=["GET", "POST"], endpoint="signup")
 def register():
-    form = RegistrationForm()
+    form = SignupForm()
     if request.method == "POST":
         if form.validate_on_submit():
             user = User(
@@ -45,8 +44,6 @@ def register():
 
             token = generate_verification_token(form.email.data)
             verification_url = url_for("auth.signup_verify", safe_token=token, _external=True)
-            print(celery.conf["broker_url"])
-            print(celery.conf["result_backend"])
             send_mail.delay(
                 to=form.email.data,
                 subject="Verify Your Email Address",
@@ -56,13 +53,12 @@ def register():
             )
             return jsonify({"next_url": url_for("auth.signup_pending")})
         else:
-            print(form.errors)
             return jsonify(form.errors), 400
 
     return render_template("auth/signup.html", form=form)
 
 
-@bp.route("/signup/pending", methods=["GET"], endpoint="signup_pending")
+@bp.route("/signup/pending/", methods=["GET"], endpoint="signup_pending")
 def signup_pending():
     referrer = request.referrer
     if referrer is None or not referrer.startswith(request.host_url):
@@ -86,12 +82,13 @@ def verify_account(safe_token=None):
             # active user account
             user.active = True
             db.session.add(user)
-            return render_template("auth/verification.html", verification_result="valid")
+            return render_template("auth/verification.html",
+                                   verification_result="valid", name=user.name)
 
     return redirect(url_for("index"))
 
 
-@bp.route("/login", methods=["GET", "POST"], endpoint="login")
+@bp.route("/login/", methods=["GET", "POST"], endpoint="login")
 def login():
     # TODO: add flask-session and redis
     if request.method == "POST":
@@ -114,13 +111,13 @@ def login():
     return render_template("auth/login.html")
 
 
-@bp.route("/logout", methods=["POST"], endpoint="logout")
+@bp.route("/logout/", methods=["POST"], endpoint="logout")
 def logout():
     session.clear()
     return redirect(url_for("index"))
 
 
-@bp.route("/reset", methods=["GET", "POST"], endpoint="reset")
+@bp.route("/reset/", methods=["GET", "POST"], endpoint="reset")
 @bp.route("/reset/<safe_token>", methods=["GET", "POST"], endpoint="reset")
 def reset():
     # TODO: implement reset password

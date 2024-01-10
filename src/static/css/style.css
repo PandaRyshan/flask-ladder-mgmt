@@ -8,9 +8,16 @@ body {
     margin: 0;
 }
 .card {
-    width: 400px; /* Adjust width as needed */
+    width: 400px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.notification-card {
+    min-width: 400px;
+    max-width: 700px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #FFFFFF;
 }
 #messageModal .modal-dialog {
     display: flex;

@@ -5,7 +5,7 @@ from src.models.verification_codes import VerificationCode
 from src.models.user import User
 
 
-class RegistrationForm(FlaskForm):
+class SignupForm(FlaskForm):
 
     def validate_invite_code(form, field):
         """

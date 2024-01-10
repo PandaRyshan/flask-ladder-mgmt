@@ -4,9 +4,9 @@
 
 {% block content %}
 
-<div class="card">
+<div class="notification-card">
   {% if verification_result == 'valid' %}
-    Welcome! Your email address has been verified. <a href="/login">Login Now.</a>
+    Welcome {{ name }}! Your email address has been verified. <a href="/login">Login Now.</a>
   {% elif verification_result == 'invalid' %}
     Sorry, this link you used is invalid.
   {% else %}
