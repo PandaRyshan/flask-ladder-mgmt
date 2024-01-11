@@ -20,8 +20,6 @@ services:
     image: redis
     container_name: redis
     restart: always
-    command: redis-server --requirepass redis --save 60 1 --loglevel warning
-    environment:
-      REDIS_PASSWORD: redis
+    command: redis-server --save 60 1 --loglevel warning
     ports:
       - "6379:6379"

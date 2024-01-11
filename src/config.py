@@ -8,6 +8,7 @@ class BaseConfig(object):
     # make sure all security config are overriden in production
     SECRET_KEY = os.environ['SECRET_KEY']
     SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
+    REDIS_URI = os.environ['REDIS_URI']
     # flask-security
     SECURITY_PASSWORD_SALT = os.environ['SECURITY_PASSWORD_SALT']
     SECURITY_PASSWORD_HASH = os.environ['SECURITY_PASSWORD_HASH']
@@ -32,7 +33,6 @@ class BaseConfig(object):
     FLASK_ADMIN_SWATCH = 'cerulean'
     # log path
     LOG_PATH = '/tmp/vpn_admin.log'
-    REDIS_URI = os.environ['REDIS_URI']
 
 
 class DevelopmentConfig(BaseConfig):
