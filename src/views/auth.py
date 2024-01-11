@@ -26,7 +26,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-@bp.route("/signup/", methods=["GET", "POST"], endpoint="signup")
+@bp.route("/signup", methods=["GET", "POST"], endpoint="signup")
 def register():
     form = SignupForm()
     if request.method == "POST":
@@ -88,7 +88,7 @@ def verify_account(safe_token=None):
     return redirect(url_for("index"))
 
 
-@bp.route("/login/", methods=["GET", "POST"], endpoint="login")
+@bp.route("/login", methods=["GET", "POST"], endpoint="login")
 def login():
     # TODO: add flask-session and redis
     if request.method == "POST":
@@ -111,13 +111,13 @@ def login():
     return render_template("auth/login.html")
 
 
-@bp.route("/logout/", methods=["POST"], endpoint="logout")
+@bp.route("/logout", methods=["POST"], endpoint="logout")
 def logout():
     session.clear()
     return redirect(url_for("index"))
 
 
-@bp.route("/reset/", methods=["GET", "POST"], endpoint="reset")
+@bp.route("/reset", methods=["GET", "POST"], endpoint="reset")
 @bp.route("/reset/<safe_token>", methods=["GET", "POST"], endpoint="reset")
 def reset():
     # TODO: implement reset password

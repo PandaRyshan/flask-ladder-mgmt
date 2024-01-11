@@ -46,17 +46,17 @@ def create_app(test_config=None):
     from src.views.auth import login_manager
     login_manager.init_app(app)
 
-    @app.route("/index/")
+    @app.route("/index")
     @app.route("/", endpoint='index')
     @login_required
     def hello():
         return redirect(url_for("user.dashboard"))
 
-    @app.route("/signup/", methods=["GET"], endpoint="signup")
+    @app.route("/signup", methods=["GET"], endpoint="signup")
     def signup():
         return redirect(url_for("auth.signup"))
 
-    @app.route("/login/", methods=["GET"], endpoint="login")
+    @app.route("/login", methods=["GET"], endpoint="login")
     def login():
         return redirect(url_for("auth.login"))
 
