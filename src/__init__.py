@@ -53,7 +53,7 @@ def create_app(test_config=None):
         return redirect(url_for("user.dashboard"))
 
     @app.route("/signup/", methods=["GET"], endpoint="signup")
-    def register():
+    def signup():
         return redirect(url_for("auth.signup"))
 
     @app.route("/login/", methods=["GET"], endpoint="login")
