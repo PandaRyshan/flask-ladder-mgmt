@@ -32,10 +32,7 @@ class BaseConfig(object):
     FLASK_ADMIN_SWATCH = 'cerulean'
     # log path
     LOG_PATH = '/tmp/vpn_admin.log'
-    REDIS_HOST = os.environ['REDIS_HOST']
-    REDIS_PORT = os.environ['REDIS_PORT']
-    REDIS_DB = os.environ['REDIS_DB']
-    REDIS_PASSWORD = os.environ['REDIS_PASSWORD']
+    REDIS_URI = os.environ['REDIS_URI']
 
 
 class DevelopmentConfig(BaseConfig):
