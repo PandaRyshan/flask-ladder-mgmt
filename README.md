@@ -24,7 +24,11 @@ This is a dashboard for ladder management. Includes user management, VPS managem
    pip install -e .[dev]
    ```
 
-   If you met error when you install psycopg2, try to install libpq-dev(Debian/Ubuntu) or posgresql-libs(Arch).
+   If you met error when you install psycopg2, try to install dependences:
+
+   * libpq-dev (Debian/Ubuntu)
+   * postgresql-libs (Arch)
+   * postgresql-server-devel and python311-devel (openSUSE)
 
 4. Init db
 
@@ -48,10 +52,10 @@ This is a dashboard for ladder management. Includes user management, VPS managem
 
 ## TODO
 
-- [x] User management
-  - [ ] Reset password
-- [ ] Ladder management
-  - [ ] Ladder account management
-  - [ ] Client download
-- [ ] Notification
-- [ ] Server auto upgrade
+* [x] User management
+  * [ ] Reset password
+* [ ] Ladder management
+  * [ ] Ladder account management
+  * [ ] Client download
+* [ ] Notification
+* [ ] Server auto upgrade
