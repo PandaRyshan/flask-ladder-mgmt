@@ -34,16 +34,17 @@ def init_db_command(drop):
     # SQLAlchemy knows about them before calling create_all
     from src import models
     db.create_all()
+
+    from src.models.role import Role
+    role = Role(name="admin")
+    db.session.add(role)
+    role = Role(name="user")
+    db.session.add(role)
+
+    from src.models.verification_code import VerificationCode
+    verification_code = VerificationCode(
+        code="123456", used=False, created_at=datetime.now(), expires_at=datetime.now() + timedelta(days=1))
+    db.session.add(verification_code)
+    db.session.commit()
+
     click.echo("Initialized the database.")
-
-    if testdata:
-        from src.models.role import Role
-        role = Role(name="admin")
-        db.session.add(role)
-        role = Role(name="user")
-        db.session.add(role)
-
-        from src.models.verification_codes import VerificationCodes
-        verification_code = VerificationCodes(
-            code="123456", used=False, created_at=datetime.now(), expires_at=datetime.now() + timedelta(days=1))
-        db.session.add(verification_code)

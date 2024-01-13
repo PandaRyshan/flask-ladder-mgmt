@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, validators
-from src.models.verification_codes import VerificationCode
+from src.models.verification_code import VerificationCode
 from src.models.user import User
 
 
