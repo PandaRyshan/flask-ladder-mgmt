@@ -55,3 +55,7 @@ class SignupForm(FlaskForm):
         ], name="confirmPassword"
     )
 
+
+class SigninForm(FlaskForm):
+    email = StringField("Email", [validators.DataRequired(), validators.Email()])
+    password = PasswordField("Password", validators=[validators.DataRequired()])

@@ -9,7 +9,7 @@ from src.models.user import User
 from src.models.role import Role
 from src.utils.db import db
 from src.utils.mail import send_mail
-from src.forms.signup_form import SignupForm
+from src.forms.auth_form import SignupForm, SigninForm
 from src.views.contants import RoleEnum
 
 
@@ -58,7 +58,7 @@ def register():
     return render_template("auth/signup.html", form=form)
 
 
-@bp.route("/signup/pending/", methods=["GET"], endpoint="signup_pending")
+@bp.route("/signup/pending", methods=["GET"], endpoint="signup_pending")
 def signup_pending():
     referrer = request.referrer
     if referrer is None or not referrer.startswith(request.host_url):
@@ -91,24 +91,23 @@ def verify_account(safe_token=None):
 @bp.route("/login", methods=["GET", "POST"], endpoint="login")
 def login():
     # TODO: add flask-session and redis
+    form = SigninForm()
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
+        if form.validate_on_submit():
 
-        error = None
+            user = User.query.filter_by(email=form.email.data).first()
+            if user is None or check_password_hash(user.password, form.password.data):
+                error = "Incorrect username or password."
 
-        user = User.query.filter_by(username=username).first()
-        if user is None or check_password_hash(user["password"], password):
-            error = "Incorrect username or password."
+            if error is None:
+                session.clear()
+                session["user_id"] = user.id
+                print("-------- LOING SUCCESS --------")
+                return redirect(url_for("user.dashboard"))
 
-        if error is None:
-            session.clear()
-            session["user_id"] = user["id"]
-            return redirect(url_for("index"))
-
-        flash(error)
+            flash(error)
     
-    return render_template("auth/login.html")
+    return render_template("auth/login.html", form=form)
 
 
 @bp.route("/logout", methods=["POST"], endpoint="logout")

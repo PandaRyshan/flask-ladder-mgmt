@@ -1,5 +1,6 @@
 import click
 
+from datetime import datetime, timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask.cli import with_appcontext
 
@@ -34,3 +35,15 @@ def init_db_command(drop):
     from src import models
     db.create_all()
     click.echo("Initialized the database.")
+
+    if testdata:
+        from src.models.role import Role
+        role = Role(name="admin")
+        db.session.add(role)
+        role = Role(name="user")
+        db.session.add(role)
+
+        from src.models.verification_codes import VerificationCodes
+        verification_code = VerificationCodes(
+            code="123456", used=False, created_at=datetime.now(), expires_at=datetime.now() + timedelta(days=1))
+        db.session.add(verification_code)
