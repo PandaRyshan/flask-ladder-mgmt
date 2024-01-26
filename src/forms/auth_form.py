@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, validators
+from werkzeug.security import check_password_hash
 from src.models.verification_code import VerificationCode
 from src.models.user import User
 
@@ -57,5 +58,11 @@ class SignupForm(FlaskForm):
 
 
 class SigninForm(FlaskForm):
+    def validate_email(form, field):
+        user = User.query.filter_by(email=field.data).first()
+        if user is None or check_password_hash(user.password, form.password.data):
+            raise validators.ValidationError("Email or Password is incorrect.")
+        if user.active is False:
+            raise validators.ValidationError("Please verify your email address.")
     email = StringField("Email", [validators.DataRequired(), validators.Email()])
     password = PasswordField("Password", validators=[validators.DataRequired()])

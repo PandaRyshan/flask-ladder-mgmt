@@ -3,7 +3,7 @@ import uuid
 from flask import Blueprint, redirect, render_template, request, session, \
     url_for, flash, current_app, jsonify
 from flask_login import LoginManager
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import  generate_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from src.models.user import User
 from src.models.role import Role
@@ -94,18 +94,10 @@ def login():
     form = SigninForm()
     if request.method == "POST":
         if form.validate_on_submit():
-
-            user = User.query.filter_by(email=form.email.data).first()
-            if user is None or check_password_hash(user.password, form.password.data):
-                error = "Incorrect username or password."
-
-            if error is None:
-                session.clear()
-                session["user_id"] = user.id
-                print("-------- LOING SUCCESS --------")
-                return redirect(url_for("user.dashboard"))
-
-            flash(error)
+            session["username"] = form.email.data
+            return jsonify({"next_url": url_for("user.dashboard")})
+        else:
+            return jsonify(form.errors), 400
     
     return render_template("auth/login.html", form=form)
 

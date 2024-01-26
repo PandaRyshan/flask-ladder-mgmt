@@ -7,7 +7,7 @@ from src.views.auth import bp as auth_bp
 from src.views.admin import VPNAdminIndexView, AuthModeView
 
 
-class RouteManager:
+class Manager:
 
     @staticmethod
     def register_admin(app):

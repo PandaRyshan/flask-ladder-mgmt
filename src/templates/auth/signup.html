@@ -40,37 +40,11 @@
     </form>
   </div>
 </div>
-
-<div class="modal" tabindex="-1" role="dialog" id="messageModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Message</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p id="messageContent"></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
   $(function() {
-
-    function showMessage(title, message) {
-      $('#messageModal .modal-title').text(title);
-      $('#messageContent').text(message);
-      $('#messageModal').modal('show');
-      Overlay.hide();
-    }
 
     $('#signup-form').submit(function(e) {
       e.preventDefault();
@@ -121,7 +95,7 @@
             var errors = error.responseJSON;
             var messages = Object.values(errors).map(function(item) {
               if (Array.isArray(item)) {
-                return item.join('\n');
+                return item.join('<br>');
               } else {
                 return item;
               }

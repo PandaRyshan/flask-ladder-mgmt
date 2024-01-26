@@ -9,3 +9,10 @@ var Overlay = {
         this.$overlay.hide();
     }
 };
+
+function showMessage(title, message) {
+    $('#messageModal .modal-title').text(title);
+    $('#messageContent').text(message);
+    $('#messageModal').modal('show');
+    Overlay.hide();
+}

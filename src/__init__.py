@@ -60,11 +60,11 @@ def create_app(test_config=None):
     def login():
         return redirect(url_for("auth.login"))
 
-    from src.route_manager import RouteManager
+    from src.manager import Manager
     
     # register flask admin & blueprint
-    RouteManager.register_admin(app)
-    RouteManager.register_security(app, db.db)
-    RouteManager.register_routes(app)
+    Manager.register_admin(app)
+    Manager.register_security(app, db.db)
+    Manager.register_routes(app)
 
     return app
