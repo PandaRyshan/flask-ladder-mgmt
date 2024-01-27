@@ -1,5 +1,5 @@
 from flask_security import UserMixin
-from src.utils.db import db
+from extensions.db import db
 from src.models.user_roles import UserRoles
 
 

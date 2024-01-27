@@ -2,28 +2,17 @@ import uuid
 
 from flask import Blueprint, redirect, render_template, request, session, \
     url_for, flash, current_app, jsonify
-from flask_login import LoginManager
 from werkzeug.security import  generate_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from src.models.user import User
 from src.models.role import Role
-from src.utils.db import db
+from extensions.db import db
 from src.utils.mail import send_mail
 from src.forms.auth_form import SignupForm, SigninForm
 from src.views.contants import RoleEnum
 
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
-
-
-# Initialize login manager
-login_manager = LoginManager()
-login_manager.login_view = "auth.login"
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
 
 @bp.route("/signup", methods=["GET", "POST"], endpoint="signup")

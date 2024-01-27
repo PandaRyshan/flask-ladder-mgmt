@@ -1,4 +1,4 @@
-from src.utils.db import db
+from extensions.db import db
 
 
 class VerificationCode(db.Model):

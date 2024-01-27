@@ -5,7 +5,7 @@ from flask import Flask
 celery = Celery()
 
 
-def init_celery(app: Flask) -> Celery:
+def init(app: Flask) -> Celery:
     class FlaskTask(Task):
         def __call__(self, *args: object, **kwargs: object) -> object:
             with app.app_context():

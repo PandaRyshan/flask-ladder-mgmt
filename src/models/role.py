@@ -1,5 +1,5 @@
 from flask_security import RoleMixin
-from src.utils.db import db
+from extensions.db import db
 
 
 class Role(db.Model, RoleMixin):
