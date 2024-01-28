@@ -12,10 +12,6 @@ def create_app(test_config=None):
     """Create and configure an instance of the Flask application."""
     app = Flask(__name__, instance_relative_config=True)
 
-    # csrf protection lazily
-    csrf = CSRFProtect()
-    csrf.init_app(app)
-
     from src import config
     if not test_config:
         # load the instance .env
@@ -33,6 +29,10 @@ def create_app(test_config=None):
     # logging configuration
     from logger import LoggerConfigurator
     LoggerConfigurator.setup_app_logger(app)
+
+    # csrf protection lazily
+    csrf = CSRFProtect()
+    csrf.init_app(app)
 
     # register app extensions
     from src.extensions import blueprints, login, admin, security, \

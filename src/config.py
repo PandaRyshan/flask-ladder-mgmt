@@ -32,7 +32,7 @@ class BaseConfig(object):
     # flask admin theme
     FLASK_ADMIN_SWATCH = 'cerulean'
     # log path
-    LOG_PATH = '/tmp/vpn_admin.log'
+    FLASK_LOG_PATH = os.environ['FLASK_LOG_PATH']
 
 
 class DevelopmentConfig(BaseConfig):
@@ -44,5 +44,4 @@ class TestingConfig(BaseConfig):
 
 
 class ProductionConfig(BaseConfig):
-    LOG_PATH = '/var/log/vpn_admin/app.log'
     SERVER_NAME = os.environ['SERVER_NAME']

@@ -23,7 +23,7 @@ class LoggerConfigurator:
     def setup_app_logger(app):
         if not app.debug:
             log_level = logging.INFO
-            log_path = app.config['LOG_PATH']
+            log_path = app.config['FLASK_LOG_PATH']
 
             file_handler = RotatingFileHandler(log_path, maxBytes=10240, backupCount=10)
             formatter = RequestFormatter(
