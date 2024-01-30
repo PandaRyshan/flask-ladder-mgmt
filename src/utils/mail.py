@@ -1,6 +1,6 @@
 from flask import render_template
 from flask_mailman import EmailMultiAlternatives
-from extensions.celery import celery
+from src.extensions.celery import celery
 
 
 @celery.task(name="send_mail", bind=True, max_retries=3, default_retry_delay=60)

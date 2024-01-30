@@ -1,7 +1,8 @@
+from sqlalchemy.orm import Mapped, mapped_column
 from flask_security import RoleMixin
-from extensions.db import db
+from src.extensions.db import db
 
 
 class Role(db.Model, RoleMixin):
-    id = db.Column(db.SmallInteger(), primary_key=True, autoincrement=True)
-    name = db.Column(db.String(80), unique=True)
+    id: Mapped[int] = mapped_column(db.SmallInteger(), primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(db.String(80), unique=True)

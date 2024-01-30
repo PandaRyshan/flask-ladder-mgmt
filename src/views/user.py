@@ -2,7 +2,7 @@ from flask import render_template
 from flask import Blueprint
 from flask_login import login_required
 from src.models.user import User
-from extensions.db import db
+from src.extensions.db import db
 
 
 bp = Blueprint("user", __name__, url_prefix="/user")

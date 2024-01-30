@@ -5,9 +5,9 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ladder_dashboard"
 version = "0.1.0"
-description = "vpn admin on web"
+description = "ladder and user management dashboard"
 readme = "README.md"
-authors = [{name = "PandaRyshan", email = "ryshan@pandas.run"}]
+authors = [{name = "Xiaohong", email = "xiaohong@pandas.run"}]
 license = {text = "BSD-3-Clause"}
 requires-python = ">=3.10"
 dependencies = [
@@ -40,7 +40,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "ruff==0.1.4",
-    "ipython==8.17.2"
+    "ipython==8.17.2",
+    "ipdb"
 ]
 test = [
     "pytest==7.4.3",

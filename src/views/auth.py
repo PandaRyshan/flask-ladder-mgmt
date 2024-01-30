@@ -6,7 +6,7 @@ from werkzeug.security import  generate_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from src.models.user import User
 from src.models.role import Role
-from extensions.db import db
+from src.extensions.db import db
 from src.utils.mail import send_mail
 from src.forms.auth_form import SignupForm, SigninForm
 from src.views.contants import RoleEnum
@@ -26,7 +26,7 @@ def register():
                 email=form.email.data,
                 name=form.name.data,
                 active=False,
-                roles=[Role.query.filter_by(id=RoleEnum.USER.value).first()],
+                roles=[db.session.query(Role).filter_by(id=RoleEnum.USER.value).first()],
                 fs_uniquifier=uuid.uuid4().hex
             )
             db.session.add(user)

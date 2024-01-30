@@ -9,12 +9,10 @@ def create_app(test_config=None):
     # shell env -> .env -> .flaskenv -> os.environ
     load_dotenv()
 
-    """Create and configure an instance of the Flask application."""
     app = Flask(__name__, instance_relative_config=True)
 
     from src import config
     if not test_config:
-        # load the instance .env
         match os.environ['FLASK_ENV']:
             case 'production':
                 app.config.from_object(config.ProductionConfig)
@@ -43,8 +41,8 @@ def create_app(test_config=None):
     celery.init(app)
     blueprints.init(app)
     mail.init(app)
+    security.init(app, db.db)
     login.init(app)
     admin.init(app)
-    security.init(app, db)
 
     return app

@@ -1,14 +1,20 @@
 import click
 
 from datetime import datetime, timedelta
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask.cli import with_appcontext
+from sqlalchemy.orm import DeclarativeBase
 
 
-db = SQLAlchemy()
+class Base(DeclarativeBase):
+    pass
 
 
-def init(app):
+db = SQLAlchemy(model_class=Base)
+
+
+def init(app: Flask):
     db.init_app(app)
     app.cli.add_command(init_db_command)
 
@@ -30,9 +36,6 @@ def init_db_command(drop):
         db.drop_all()
         click.echo("Droped all tables.")
 
-    # if define models in submodules must import them so that
-    # SQLAlchemy knows about them before calling create_all
-    from src import models
     db.create_all()
 
     from src.models.role import Role
