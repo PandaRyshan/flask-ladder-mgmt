@@ -1,8 +1,9 @@
 import uuid
 
-from flask import Blueprint, redirect, render_template, request, session, \
+from flask import Blueprint, redirect, render_template, request, \
     url_for, flash, current_app, jsonify
-from werkzeug.security import  generate_password_hash
+from flask_login import login_user, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from src.models.user import User
 from src.models.role import Role
@@ -25,7 +26,6 @@ def register():
                 username=form.email.data,
                 email=form.email.data,
                 name=form.name.data,
-                active=False,
                 roles=[db.session.query(Role).filter_by(id=RoleEnum.USER.value).first()],
                 fs_uniquifier=uuid.uuid4().hex
             )
@@ -65,11 +65,12 @@ def verify_account(safe_token=None):
             return render_template("auth/verification.html", verification_result="invalid")
 
         user = User.query.filter_by(email=email).first()
-        if user.active:
+        if user.is_active:
             return render_template("auth/verification.html", verification_result="invalid")
         else:
             # active user account
-            user.active = True
+            user.is_active = True
+            user.is_authenticated = True
             db.session.add(user)
             return render_template("auth/verification.html",
                                    verification_result="valid", name=user.name)
@@ -79,21 +80,26 @@ def verify_account(safe_token=None):
 
 @bp.route("/login", methods=["GET", "POST"], endpoint="login")
 def login():
-    # TODO: add flask-session and redis
     form = SigninForm()
     if request.method == "POST":
-        if form.validate_on_submit():
-            session["username"] = form.email.data
-            return jsonify({"next_url": url_for("user.dashboard")})
-        else:
+        if not form.validate_on_submit():
             return jsonify(form.errors), 400
+
+        user = User.query.filter_by(username=form.email.data).first()
+        if user and check_password_hash(user.password, form.password.data):
+            login_user(user)
+            return redirect(url_for("user.dashboard"))
+        else:
+            flash("Username or password is not correct", "error")
     
+    if current_user.is_authenticated:
+        return redirect(url_for("user.dashboard"))
     return render_template("auth/login.html", form=form)
 
 
-@bp.route("/logout", methods=["POST"], endpoint="logout")
+@bp.route("/logout", methods=["GET", "POST"], endpoint="logout")
 def logout():
-    session.clear()
+    logout_user()
     return redirect(url_for("index"))
 
 

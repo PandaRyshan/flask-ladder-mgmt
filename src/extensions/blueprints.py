@@ -26,3 +26,7 @@ def init(app: Flask):
     @app.route("/login", methods=["GET"], endpoint="login")
     def login():
         return redirect(url_for("auth.login"))
+
+    @app.route("/logout", methods=["GET", "POST"], endpoint="logout")
+    def logout():
+        return redirect(url_for("auth.logout"))

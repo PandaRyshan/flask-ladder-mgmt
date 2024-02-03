@@ -1,6 +1,6 @@
 from flask import render_template
 from flask import Blueprint
-from flask_login import login_required
+from flask_login import login_required, current_user
 from src.models.user import User
 from src.extensions.db import db
 
@@ -17,4 +17,4 @@ def user_list():
 @bp.route("/dashboard", methods=["GET"], endpoint="dashboard")
 @login_required
 def dashboard():
-    return render_template("user/dashboard.html")
+    return render_template("user/dashboard.html", name=current_user.name)

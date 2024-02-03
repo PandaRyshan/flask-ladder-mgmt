@@ -8,7 +8,7 @@
   <div class="card-body">
     <h3 class="card-title text-center">DASHBOARD</h3>
     <p class="text-muted text-center">DO NOT share with other people</p>
-    <form id="login-form">
+    <form id="login-form" method="post">
       {{ form.csrf_token }}
       <div class="form-group">
         <label for="email">Email Address</label>
@@ -20,8 +20,8 @@
         <input type="password" class="form-control" name="password" required placeholder="Password">
       </div>
       <div class="form-group form-check">
-        <input type="checkbox" class="form-check-input" id="rememberMe">
-        <label class="form-check-label" for="rememberMe">Remember Me</label>
+        <input type="checkbox" class="form-check-input" name="remember" id="remember">
+        <label class="form-check-label" for="remember">Remember Me</label>
       </div>
       <button type="submit" class="btn btn-primary btn-block">Login</button>
       <p class="text-center">Haven't an account yet? <a href="/auth/signup">Sign Up</a></p>
@@ -48,6 +48,7 @@
       var formData = Object.fromEntries(
         formDataArray.map(item => [item.name, item.value])
       );
+      formData.remember = $('#remember').is(':checked');
 
       if (!formData.email) {
         showMessage('Error', 'Please enter invite code.');
@@ -59,35 +60,41 @@
         return;
       }
 
-      $.ajax({
-        url: '/auth/login',
-        type: 'POST',
-        data: formData,
-        success: function(data) {
-          Overlay.hide();
-          showMessage('Success', 'Login successfully. Redirecting...');
-          console.log(data.next_url);
-        },
-        error: function(error) {
-          Overlay.hide();
-          console.log('Error', error);
-          if (error.responseJSON) {
-            var errors = error.responseJSON;
-            var messages = Object.values(errors).map(function(item) {
-              if (Array.isArray(item)) {
-                return item.join('\n');
-              } else {
-                return item;
-              }
-            })
-            showMessage('Error', messages);
-          } else if (error.responseText && error.responseText.includes('expired')) {
-            showMessage('Error', 'The page is expired. Please refresh and try again.');
-          } else {
-            showMessage('Error', 'Something went wrong. Please try again later or contact us.');
-          }
-        }
-      });
+      $('#login-form').attr('action', '/auth/login');
+      this.submit();
+
+      // $.ajax({
+      //   url: '/auth/login',
+      //   type: 'POST',
+      //   data: formData,
+      //   success: function(data) {
+      //     Overlay.hide();
+      //     showMessage('Success', 'Login successfully. Redirecting...');
+      //     setTimeout(function() {
+      //       window.location.href = data.next_url;
+      //     }, 500);
+      //   },
+      //   error: function(error) {
+      //     Overlay.hide();
+      //     console.log('Error', error);
+      //     if (error.responseJSON) {
+      //       var errors = error.responseJSON;
+      //       var messages = Object.values(errors).map(function(item) {
+      //         if (Array.isArray(item)) {
+      //           return item.join('\n');
+      //         } else {
+      //           return item;
+      //         }
+      //       })
+      //       showMessage('Error', messages);
+      //     } else if (error.responseText && error.responseText.includes('expired')) {
+      //       showMessage('Error', 'The page is expired. Please refresh and try again.');
+      //     } else {
+      //       showMessage('Error', 'Something went wrong. Please try again later or contact us.');
+      //     }
+      //   }
+      // });
+
     });
   });
 </script>

@@ -8,4 +8,4 @@ from src.models.role import Role
 @staticmethod
 def init(app: Flask, db: SQLAlchemy):
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-    security = Security(app, user_datastore)
+    app.security = Security(app, user_datastore)

@@ -34,10 +34,11 @@ def create_app(test_config=None):
 
     # register app extensions
     from src.extensions import blueprints, login, admin, security, \
-        celery, db, redis, mail
+        celery, db, redis, cache, mail
 
     db.init(app)
     redis.init(app)
+    cache.init(app)
     celery.init(app)
     blueprints.init(app)
     mail.init(app)
