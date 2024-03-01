@@ -33,7 +33,7 @@ def create_app(test_config=None):
     csrf.init_app(app)
 
     # register app extensions
-    from src.extensions import blueprints, login, admin, security, \
+    from src.extensions import blueprints, admin, security, \
         celery, db, redis, cache, mail
 
     db.init(app)
@@ -43,7 +43,7 @@ def create_app(test_config=None):
     blueprints.init(app)
     mail.init(app)
     security.init(app, db.db)
-    login.init(app)
+    # login.init(app)
     admin.init(app)
 
     return app

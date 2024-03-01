@@ -31,6 +31,7 @@ dependencies = [
     "kombu==5.3.2",
     "ansible==8.5.0",
     "WTForms==3.1.1",
+    "pydantic==2.6.1",
     "setuptools==68.2.2",
     "wheel==0.41.3",
     "itsdangerous==2.1.2",

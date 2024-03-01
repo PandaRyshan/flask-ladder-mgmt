@@ -22,7 +22,11 @@ class BaseConfig(object):
     SECRET_KEY = os.environ['SECRET_KEY']
     SECURITY_PASSWORD_SALT = os.environ['SECURITY_PASSWORD_SALT']
     SECURITY_PASSWORD_HASH = os.environ['SECURITY_PASSWORD_HASH']
+    SECURITY_LOGIN_WITHIN = os.environ['SECURITY_LOGIN_WITHIN']
+    SECURITY_TRACKABLE = True
     SECURITY_REGISTERABLE = True
+    SECURITY_RECOVERABLE = True
+    SECURITY_CONFIRMABLE = True
     REMEMBER_COOKIE_SAMESITE = "strict"
     SESSION_COOKIE_SAMESITE = "strict"
     # flask-mail
@@ -39,7 +43,8 @@ class BaseConfig(object):
     # celery
     CELERY = {
         "broker_url": os.environ['CELERY_BROKER_URL'],
-        "result_backend": os.environ['CELERY_RESULT_BACKEND']
+        "result_backend": os.environ['CELERY_RESULT_BACKEND'],
+        "broker_connection_retry_on_startup": True
     }
     # flask admin theme
     FLASK_ADMIN_SWATCH = 'cerulean'
