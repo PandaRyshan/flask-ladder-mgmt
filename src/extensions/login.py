@@ -1,6 +1,6 @@
 import base64
 from http import HTTPStatus
-from flask import Flask, url_for, request, redirect, jsonify, g
+from flask import Flask, url_for, request, redirect, jsonify, g, Request
 from flask.sessions import SecureCookieSessionInterface
 from flask_login import LoginManager, user_loaded_from_request
 from src.models.user import User
@@ -28,12 +28,12 @@ def load_user(user_id):
 @login_manager.unauthorized_handler
 def unauthorized():
     if request.blueprint == "api":
-        jsonify({"message": "Unauthorized access"}), HTTPStatus.UNAUTHORIZED
-    return redirect(url_for("auth.login", next=request.endpoint))
+        return jsonify({"message": "Unauthorized access"}), HTTPStatus.UNAUTHORIZED
+    return redirect(url_for("auth.login", next=request.path))
 
 
 @login_manager.request_loader
-def load_user_from_request(req: request):
+def load_user_from_request(req: Request):
     api_key = req.args.get("api_key")
     if api_key:
         user = User.query.filter_by(api_key=api_key).first()

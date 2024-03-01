@@ -38,16 +38,25 @@ def init_db_command(drop):
 
     db.create_all()
 
-    from src.models.role import Role
-    role = Role(name="admin")
-    db.session.add(role)
-    role = Role(name="user")
-    db.session.add(role)
 
     from src.models.verification_code import VerificationCode
     verification_code = VerificationCode(
-        code="123456", used=False, created_at=datetime.now(), expires_at=datetime.now() + timedelta(days=1))
+        code="123456", used=False, created_at=datetime.now(), expires_at=datetime.now() + timedelta(days=365))
     db.session.add(verification_code)
+
+    import uuid
+    from src.models.user import User
+    from src.models.role import Role
+    from werkzeug.security import generate_password_hash
+    user = User(
+        name="admin",
+        email="admin@local.host",
+        username="admin@local.host",
+        password=generate_password_hash("admin"),
+        fs_uniquifier=uuid.uuid4().hex,
+        roles=[Role(id=1, name="ADMIN"), Role(id=2, name="USER")]
+    )
+    db.session.add(user)
     db.session.commit()
 
     click.echo("Initialized the database.")
