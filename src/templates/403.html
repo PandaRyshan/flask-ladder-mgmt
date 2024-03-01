@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+
+<div class="notification-card">
+    Permission Denied. Please contact the administrator. <a href="mailto:{{ admin_email }}"></a>
+</div>
+
+{% endblock %}
