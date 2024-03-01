@@ -1,0 +1,120 @@
+{% extends "security/base.html" %}
+{% from "security/_macros.html" import render_field_with_errors, render_field, render_field_errors, render_form_errors, prop_next %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    {% include "security/_messages.html" %}
+    <h3 class="card-title text-center">{{ _fsdomain('Login') }}</h3>
+    <p class="text-muted text-center">DO NOT share with other people</p>
+    <form action="{{ url_for_security('login') }}{{ prop_next() }}" method="post" name="login_user_form" id="login_user_form">
+      {{ login_user_form.hidden_tag() }}
+      {{ render_form_errors(login_user_form) }}
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" class="form-control" name="email" required placeholder="Enter email">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <small class="forgot-password"><a href="{{ url_for_security('forgot_password') }}">Forgot Password?</a></small>
+        <input type="password" class="form-control" name="password" required placeholder="Password">
+      </div>
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" name="remember" id="remember">
+        <label class="form-check-label" for="remember">Remember Me</label>
+      </div>
+      <input type="submit" class="btn btn-primary btn-block" name="submit" value="Login">
+      <p class="text-center">Haven't an account yet? <a href="{{ url_for_security('register') }}">Sign Up</a></p>
+      {{ render_field_errors(login_user_form.csrf_token) }}
+    </form>
+    {% if security.webauthn %}
+      <hr class="fs-gap">
+      <h2>{{ _fsdomain("Use WebAuthn to Sign In") }}</h2>
+      <div>
+        <form method="get" id="wan_signin_form" name="wan_signin_form">
+          <input id="wan_signin" name="wan_signin" type="submit" value="{{ _fsdomain('Sign in with WebAuthn') }}" formaction="{{ url_for_security('wan_signin') }}{{ prop_next() }}">
+        </form>
+      </div>
+    {% endif %}
+    {% if security.oauthglue %}
+      <hr class="fs-gap">
+      <h2>{{ _fsdomain("Use Social Oauth to Sign In") }}</h2>
+      {% for provider in security.oauthglue.provider_names %}
+        <div class="fs-gap">
+          <form method="post" id="{{ provider }}_form" name="{{ provider }}_form">
+            <input id="{{ provider }}" name="{{ provider }}" type="submit" value="{{ _fsdomain('Sign in with ')~provider }}" formaction="{{ url_for_security('oauthstart', name=provider) }}{{ prop_next() }}">
+            {% if csrf_token is defined %}
+              <input id="{{ provider }}_csrf_token" name="{{ provider }}_csrf_token" type="hidden" value="{{ csrf_token() }}">
+            {% endif %}
+          </form>
+        </div>
+      {% endfor %}
+    {% endif %}
+    <!-- {% include "security/_menu.html" %} -->
+  </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+  $(function() {
+
+    $('#login_user_form').submit(function(e) {
+      e.preventDefault();
+
+      Overlay.show();
+
+      var formDataArray = $('#login_user_form').serializeArray();
+
+      var formData = Object.fromEntries(
+        formDataArray.map(item => [item.name, item.value])
+      );
+      formData.remember = $('#remember').is(':checked');
+      formData.submit = true;
+
+      if (!formData.email) {
+        showMessage('Error', 'Please enter email.');
+        return;
+      }
+
+      if (!formData.password) {
+        showMessage('Error', 'Please enter password.');
+        return;
+      }
+
+      $('#login-form').attr('action', window.location.search);
+
+      $.ajax({
+        url: "{{ url_for_security('login') }}",
+        type: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': $('input[name="csrf_token"]').val()
+        },
+        data: JSON.stringify(formData),
+        success: function(data) {
+          Overlay.hide();
+          showMessage('Success', 'Login successfully. Redirecting...');
+          setTimeout(function() {
+            var nextUrl = new URLSearchParams(window.location.search).get('next');
+            window.location.href = nextUrl || "{{ url_for('index') }}";
+          }, 500);
+        },
+        error: function(error) {
+          Overlay.hide();
+          if (error.responseJSON) {
+            var errors = error.responseJSON;
+            var messages = errors.response.errors[0];
+            showMessage('Error', messages);
+          } else if (error.responseText && error.responseText.includes('expired')) {
+            showMessage('Error', 'The page is expired. Please refresh and try again.');
+          } else {
+            showMessage('Error', 'Something went wrong. Please try again later or contact us.');
+          }
+        }
+      });
+
+    });
+  });
+</script>
+{% endblock %}

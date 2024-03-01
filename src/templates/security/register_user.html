@@ -1,0 +1,106 @@
+{% extends "security/base.html" %}
+{% from "security/_macros.html" import render_field_with_errors, render_field, render_form_errors %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    {% include "security/_messages.html" %}
+    <h3 class="card-title text-center">{{ _fsdomain('Register') }}</h3>
+    <p class="text-muted text-center">Create an account...</p>
+    <form action="{{ url_for_security('register') }}" method="post" name="register_user_form" id="register_user_form">
+      {{ register_user_form.hidden_tag() }}
+      {{ render_form_errors(register_user_form) }}
+      <div class="form-group">
+        <input name="invite_code" class="form-control" placeholder="Invite Code" required>
+      </div>
+      <div class="form-group">
+        <input name="name" class="form-control" placeholder="Name" required>
+      </div>
+      {{ render_field_with_errors(register_user_form.email, class="form-control", placeholder="Email", required=true) }}
+      <div class="form-group">
+        <input type="password" name="password" class="form-control" placeholder="Password" pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+" minlength=8 required title="at least 8 length, contains one letter and one number">
+        <input type="password" name="password_confirm" class="form-control" placeholder="Confirm Password" required>
+      </div>
+      <div class="form-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="terms" id="terms" required>
+          <label class="form-check-label" for="terms">
+            I have read and agree to the <a href="#">Terms of Service</a>
+          </label>
+        </div>
+      </div>
+      {{ render_field(register_user_form.submit, class="btn btn-primary btn-block") }}
+    </form>
+    <p class="text-center">Already have an account? <a href="/login">Sign In</a></p>
+    <!-- {% include "security/_menu.html" %} -->
+  </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+  $(function() {
+
+    $('#register_user_form').submit(function(e) {
+      e.preventDefault();
+
+      Overlay.show();
+
+      var formDataArray = $('#register_user_form').serializeArray();
+
+      var formData = Object.fromEntries(
+        formDataArray.map(item => [item.name, item.value])
+      );
+
+      if ($('#terms').is(':checked') == false) {
+        showMessage('Error', 'Please accept terms and conditions.');
+        return;
+      }
+
+      if (!formData.invite_code) {
+        showMessage('Error', 'Please enter invite code.');
+        return;
+      }
+
+      if (!formData.password || !formData.password_confirm) {
+        showMessage('Error', 'Please enter password and confirm password.');
+        return;
+      }
+
+      if (formData.password !== formData.password_confirm) {
+        showMessage('Error', 'Password and confirm password does not match.');
+        return;
+      }
+
+      $.ajax({
+        url: "{{ url_for_security('register') }}",
+        type: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': $('input[name="csrf_token"]').val()
+        },
+        data: JSON.stringify(formData),
+        success: function(data) {
+          Overlay.hide();
+          showMessage('Success', 'Your account has been created successfully. Please check the confirmation email and verify your account.');
+          setTimeout(function() {
+            window.location.href = "{{ url_for_security('login') }}";
+          }, 3000);
+        },
+        error: function(error) {
+          Overlay.hide();
+          if (error.responseJSON) {
+            var errors = error.responseJSON;
+            var message = errors.response.errors[0];
+            showMessage('Error', message);
+          } else if (error.responseText && error.responseText.includes('expired')) {
+            showMessage('Error', 'The page is expired. Please refresh and try again.');
+          } else {
+            showMessage('Error', 'Something went wrong. Please try again later or contact us.');
+          }
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}
