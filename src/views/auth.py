@@ -1,45 +1,28 @@
-import uuid
-
 from flask import Blueprint, redirect, render_template, request, \
-    url_for, flash, current_app, jsonify
-from flask_login import login_user, logout_user, current_user
+    url_for, jsonify
+from flask_security import login_user, logout_user, current_user, login_required
+from services import user_service
 from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+from src.dto.user_dto import UserDto
 from src.models.user import User
-from src.models.role import Role
-from src.extensions.db import db
-from src.utils.mail import send_mail
 from src.forms.auth_form import SignupForm, SigninForm
-from src.views.contants import RoleEnum
 
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
-@bp.route("/signup", methods=["GET", "POST"], endpoint="signup")
+@bp.route("/signup/", methods=["GET", "POST"], endpoint="signup")
 def register():
     form = SignupForm()
     if request.method == "POST":
         if form.validate_on_submit():
-            user = User(
-                password=generate_password_hash(form.password.data),
-                username=form.email.data,
+            user = UserDto(
                 email=form.email.data,
+                password=generate_password_hash(form.password.data),
                 name=form.name.data,
-                roles=[db.session.query(Role).filter_by(id=RoleEnum.USER.value).first()],
-                fs_uniquifier=uuid.uuid4().hex
             )
-            db.session.add(user)
+            user_service.create_user(user)
 
-            token = generate_verification_token(form.email.data)
-            verification_url = url_for("auth.signup_verify", safe_token=token, _external=True)
-            send_mail.delay(
-                to=form.email.data,
-                subject="Verify Your Email Address",
-                template="mail/verification",
-                verification_url=verification_url,
-                name=form.name.data
-            )
             return jsonify({"next_url": url_for("auth.signup_pending")})
         else:
             return jsonify(form.errors), 400
@@ -47,7 +30,7 @@ def register():
     return render_template("auth/signup.html", form=form)
 
 
-@bp.route("/signup/pending", methods=["GET"], endpoint="signup_pending")
+@bp.route("/signup/pending/", methods=["GET"], endpoint="signup_pending")
 def signup_pending():
     referrer = request.referrer
     if referrer is None or not referrer.startswith(request.host_url):
@@ -55,56 +38,53 @@ def signup_pending():
     return render_template("auth/verification.html")
 
 
-@bp.route("/signup/verify/<safe_token>", methods=["GET"], endpoint="signup_verify")
+@bp.route("/signup/verify/<safe_token>/", methods=["GET"], endpoint="signup_verify")
 def verify_account(safe_token=None):
     if safe_token:
-        email = verify_token(safe_token)
+        email = user_service.verify_token(safe_token)
 
         # invalid token
         if not email:
             return render_template("auth/verification.html", verification_result="invalid")
 
-        user = User.query.filter_by(email=email).first()
-        if user.is_active:
-            return render_template("auth/verification.html", verification_result="invalid")
-        else:
-            # active user account
-            user.is_active = True
-            user.is_authenticated = True
-            db.session.add(user)
-            return render_template("auth/verification.html",
-                                   verification_result="valid", name=user.name)
+        name_of_user = user_service.verify_user(email)
+        return render_template("auth/verification.html",
+                                verification_result="valid", name=name_of_user)
 
     return redirect(url_for("index"))
 
 
-@bp.route("/login", methods=["GET", "POST"], endpoint="login")
+@bp.route("/login/", methods=["GET", "POST"], endpoint="login")
 def login():
     form = SigninForm()
     if request.method == "POST":
         if not form.validate_on_submit():
             return jsonify(form.errors), 400
 
-        user = User.query.filter_by(username=form.email.data).first()
+        user = User.query.filter_by(email=form.email.data).first()
+        next_url = request.args.get("next")
+
         if user and check_password_hash(user.password, form.password.data):
-            login_user(user)
-            return redirect(url_for("user.dashboard"))
+            if login_user(user=user, remember=form.remember.data):
+                return jsonify({"next_url": next_url or url_for("user.dashboard")})
+            return jsonify({"error": "Invalid email or password"}), 400
         else:
-            flash("Username or password is not correct", "error")
+            return jsonify({"error": "Invalid email or password"}), 400
     
-    if current_user.is_authenticated:
+    if current_user and current_user.is_active:
         return redirect(url_for("user.dashboard"))
     return render_template("auth/login.html", form=form)
 
 
-@bp.route("/logout", methods=["GET", "POST"], endpoint="logout")
+@bp.route("/logout/", methods=["GET", "POST"], endpoint="logout")
+@login_required
 def logout():
     logout_user()
-    return redirect(url_for("index"))
+    return redirect(url_for("auth.login"))
 
 
-@bp.route("/reset", methods=["GET", "POST"], endpoint="reset")
-@bp.route("/reset/<safe_token>", methods=["GET", "POST"], endpoint="reset")
+@bp.route("/reset/", methods=["GET", "POST"], endpoint="reset")
+@bp.route("/reset/<safe_token>/", methods=["GET", "POST"], endpoint="reset")
 def reset():
     # TODO: implement reset password
     if request.method == "POST":
@@ -114,21 +94,3 @@ def reset():
         pass
     
     return render_template("auth/reset.html")
-
-
-def generate_verification_token(email):
-    secret_key = current_app.config["SECRET_KEY"]
-    salt = current_app.config["SECURITY_PASSWORD_SALT"]
-    serializer = URLSafeTimedSerializer(secret_key)
-    return serializer.dumps(email, salt=salt)
-
-
-def verify_token(saved_token, expiration=10800):
-    secret_key = current_app.config["SECRET_KEY"]
-    salt = current_app.config["SECURITY_PASSWORD_SALT"]
-    serializer = URLSafeTimedSerializer(secret_key)
-    try:
-        email = serializer.loads(saved_token, salt=salt, max_age=expiration)
-    except SignatureExpired:
-        return False
-    return email

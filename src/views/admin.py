@@ -1,27 +1,36 @@
-from flask import redirect, url_for, request
-from flask_admin import AdminIndexView
+from flask_admin import AdminIndexView, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
-from flask_login import current_user
-from werkzeug.exceptions import abort
+from flask_login import login_required
+from flask_security.decorators import roles_required
+from src.services import user_service
+from src.contants import ADMIN
 
 
-class VPNAdminIndexView(AdminIndexView):
-    def is_accessible(self):
-        return current_user.is_authenticated and current_user.is_admin and current_user.is_active
+class IndexViews(AdminIndexView):
 
-    def inaccessible_callback(self, name, **kwargs):
-        # redirect to login page if user doesn't have access
-        if not current_user.is_authenticated:
-            return redirect(url_for("auth.login", next=request.url))
-        abort(403)
+    @expose("/")
+    @login_required
+    @roles_required(ADMIN)
+    def index(self):
+        return self.render("admin/index.html")
 
 
-class AuthModeView(ModelView):
-    def is_accessible(self):
-        return current_user.is_authenticated and current_user.is_admin and current_user.is_active
+class UserView(ModelView):
+    column_list = ["email", "password", "name", "roles"]
+    page_size = 20
 
-    def inaccessible_callback(self, name, **kwargs):
-        # redirect to login page if user doesn't have access
-        if not current_user.is_authenticated:
-            return redirect(url_for("auth.login", next=request.url))
-        abort(403)
+    form_excluded_columns = ["username", "fs_uniquifier", "created_at", "updated_at"]
+
+    @expose("/")
+    @login_required
+    @roles_required(ADMIN)
+    def index(self):
+        users = user_service.get_all_users()
+        return self.render("admin/users.html", users=users)
+
+
+    @expose("/edit/<int:id>/", methods=["GET", "POST"])
+    @login_required
+    @roles_required(ADMIN)
+    def edit(self, id):
+        return super(UserView, self).edit(id)

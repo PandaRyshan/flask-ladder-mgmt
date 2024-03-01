@@ -1,6 +1,8 @@
-from flask import render_template
-from flask import Blueprint
-from flask_login import login_required, current_user
+import json
+import time
+
+from flask import render_template, make_response, Blueprint, stream_with_context, Response
+from flask_security.decorators import roles_required, login_required, current_user
 from src.models.user import User
 from src.extensions.db import db
 
@@ -8,7 +10,8 @@ from src.extensions.db import db
 bp = Blueprint("user", __name__, url_prefix="/user")
 
 
-@bp.route("/list", methods=["GET"], endpoint="list")
+@bp.route("/", methods=["GET"], endpoint="list")
+@login_required
 def user_list():
     users = db.session.execute(db.select(User).order_by(User.username)).scalars().all()
     return render_template("user/list.html", users=users)
@@ -18,3 +21,15 @@ def user_list():
 @login_required
 def dashboard():
     return render_template("user/dashboard.html", name=current_user.name)
+
+
+@bp.route("/event", methods=["GET", "POST"], endpoint="event")
+def test():
+    return Response(stream_with_context(generate_msg()), content_type="text/event-stream", status=200)
+
+
+def generate_msg():
+    while True:
+        json_data = json.dumps({"time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), "msg": "Hello, World!"})
+        yield f"data: {json_data}\n\n"
+        time.sleep(1)
