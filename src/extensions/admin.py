@@ -1,10 +1,28 @@
 from flask import Flask
 from flask_admin import Admin
-from src.views.admin import VPNAdminIndexView
+from src.models.user import User
+from src.views.admin import IndexViews, UserView
+from src.extensions.db import db
 
 
 @staticmethod
 def init(app: Flask):
     # flask admin view registration
-    admin = Admin(app, name='Admin', template_mode='bootstrap3', index_view=VPNAdminIndexView())
-    # admin.add_view(AuthModelView(User, db.session))
+    admin = Admin(
+        app=app,
+        name="Admin",
+        template_mode="bootstrap4",
+        index_view=IndexViews(),
+        url="/admin/"
+    )
+
+    admin.add_view(
+        UserView(
+            model=User,
+            session=db.session,
+            name="Users",
+            endpoint="users",
+            menu_icon_type="glyph",
+            menu_icon_value="glyphicon-user"
+        )
+    )
