@@ -1,5 +1,9 @@
 {% extends 'admin/master.html' %}
 
+{% block access_control %}
+  <a class="btn btn-light btn-sm" href="/logout">Logout</a>
+{% endblock %}
+
 {% block body %}
-  <p>Hello world</p>
+  <p>Hello world !!!</p>
 {% endblock %}

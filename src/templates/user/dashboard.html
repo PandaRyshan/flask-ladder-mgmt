@@ -1,4 +1,53 @@
-{% block body %}
-    <p> Welcome! {{ name }}! </p>
-    <a href="/logout">Logout</a>
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="notification-card">
+    <div class="card-body">
+        <p> Welcome! {{ name }}! </p>
+        <a href="/logout">Logout</a>
+    </div>
+    <div class="card-body">
+        <iframe src="http://127.0.0.1:3000/d-solo/f1a58ede-8a72-4ba5-bff3-e2b8373c858b/contabo-dev-server?orgId=1&refresh=5m&panelId=2" width="450" height="200" frameborder="0"></iframe>
+        <iframe src="http://127.0.0.1:3000/d-solo/f1a58ede-8a72-4ba5-bff3-e2b8373c858b/contabo-dev-server?orgId=1&refresh=5m&panelId=1" width="450" height="200" frameborder="0"></iframe>
+    </div>
+    <div class="card-body" id="msg"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    function refreshIframe() {
+        var now = new Date().getTime();
+        var eightHoursAgo = now - 28800000;
+        $('iframe').each(function() {
+            var src = $(this).attr('src');
+            var baseUrl = src.split('?')[0];
+            var orgId = src.split('orgId=')[1].split('&')[0];
+            var panelId = src.split('panelId=')[1].split('&')[0];
+            var newSrc = baseUrl +
+              '?orgId=' + orgId +
+              '&panelId=' + panelId +
+              '&from=' + eightHoursAgo + '&to=' + now;
+            $(this).attr('src', newSrc);
+            console.log($(this).attr('src'));
+        });
+    }
+
+    refreshIframe();
+    setInterval(refreshIframe, 100000); // 300000毫秒 = 5分钟
+
+    var evtSource = new EventSource("/user/event");
+    evtSource.onmessage = function(event) {
+        var newElement = document.createElement("p");
+        var eventObj = JSON.parse(event.data);
+        newElement.innerHTML = "message: " + eventObj.msg + " at " + eventObj.time;
+        // document.getElementById('msg').appendChild(newElement);
+    };
+
+    evtSource.onerror = function(event) {
+        console.log(event);
+    };
+</script>
 {% endblock %}
