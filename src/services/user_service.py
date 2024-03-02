@@ -1,8 +1,7 @@
-from flask import url_for, current_app
+from flask import current_app
 from src.models.user import User, Role
 from src.dto.user_dto import UserDto
 from src.extensions.db import db
-from src.utils.mail import send_mail
 from sqlalchemy.orm import joinedload
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
@@ -26,14 +25,6 @@ def create_user(user_dto: UserDto):
     db.session.add(user)
 
     token = generate_verification_token(user.email)
-    verification_url = url_for("auth.signup_verify", safe_token=token, _external=True)
-    send_mail.delay(
-        to=user.email,
-        subject="Verify Your Email Address",
-        template="mail/verification",
-        verification_url=verification_url,
-        name=user.name
-    )
 
 
 def verify_user(email: str):

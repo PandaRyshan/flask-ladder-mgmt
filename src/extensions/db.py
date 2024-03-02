@@ -47,14 +47,15 @@ def init_db_command(drop):
     import uuid
     from src.models.user import User
     from src.models.role import Role
-    from werkzeug.security import generate_password_hash
+    from flask_security.utils import hash_password
     user = User(
         name="admin",
         email="admin@local.host",
         username="admin@local.host",
-        password=generate_password_hash("admin"),
+        password=hash_password("admin"),
         fs_uniquifier=uuid.uuid4().hex,
-        roles=[Role(id=1, name="ADMIN"), Role(id=2, name="USER")]
+        roles=[Role(id=1, name="ADMIN"), Role(id=2, name="USER")],
+        confirmed_at=datetime.now()
     )
     db.session.add(user)
     db.session.commit()
