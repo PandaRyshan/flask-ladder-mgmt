@@ -38,3 +38,4 @@ class LoggerConfigurator:
 
             logging.getLogger('werkzeug').setLevel(log_level)
             logging.getLogger('werkzeug').addHandler(file_handler)
+            logging.getLogger('passlib').setLevel(logging.ERROR)
