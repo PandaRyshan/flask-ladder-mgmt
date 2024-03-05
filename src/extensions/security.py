@@ -1,22 +1,21 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_security import Security, SQLAlchemyUserDatastore
+from flask_security import Security
+from flask_security.datastore import SQLAlchemyUserDatastore
 from src.models.user import User
 from src.models.role import Role
 from src.forms.auth_form import ConfirmRegisterFormExtended
 from src.utils.mail import SecurityMail
+from src.extensions.db import db
 
 
 security = Security()
 
 
 @staticmethod
-def init(app: Flask, db: SQLAlchemy):
-    user_datastore = CustomUserDatastore(db, User, Role)
-    security.init_app(
+def init(app: Flask):
+    app.security = Security(
         app=app,
-        datastore=user_datastore,
-        register_blueprint=True,
+        datastore=CustomUserDatastore(db, User, Role),
         confirm_register_form=ConfirmRegisterFormExtended,
         mail_util_cls=SecurityMail
     )

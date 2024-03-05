@@ -52,13 +52,3 @@ class User(db.Model, UserMixin):
     current_login_ip: Mapped[str] = mapped_column(db.String(100), nullable=True)
     confirmed_at: Mapped[datetime] = mapped_column(db.DateTime, nullable=True)
     login_count: Mapped[int] = mapped_column(db.Integer, default=0)
-
-
-    def get_id(self) -> str:
-        """
-        Returns the string representation of the user's ID.
-
-        :return: The string representation of the user's ID.
-        :rtype: str
-        """
-        return str(self.id)

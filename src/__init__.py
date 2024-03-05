@@ -42,8 +42,7 @@ def create_app(test_config=None):
     celery.init(app)
     blueprints.init(app)
     mail.init(app)
-    security.init(app, db.db)
-    # login.init(app)
+    security.init(app)
     admin.init(app)
 
     return app

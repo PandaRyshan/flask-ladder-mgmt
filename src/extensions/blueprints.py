@@ -1,5 +1,5 @@
 from flask import Flask, redirect, render_template,  url_for
-from flask_security import auth_required, login_required
+from flask_security import auth_required
 from src.views.user import bp as user_bp
 # from src.views.admin import bp as admin_bp
 
@@ -15,7 +15,7 @@ def init(app: Flask):
 
     @app.route("/index/")
     @app.route("/", endpoint='index')
-    @login_required
+    @auth_required()
     def hello():
         return redirect(url_for("user.dashboard"))
 
