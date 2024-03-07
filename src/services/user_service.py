@@ -1,5 +1,6 @@
 from flask import current_app
-from src.models.user import User, Role
+from src.models.user import User
+from src.models.role import Role
 from src.dto.user_dto import UserDto
 from src.extensions.db import db
 from sqlalchemy.orm import joinedload
@@ -8,6 +9,10 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
 def get_all_users():
     return User.query.options(joinedload(User.roles)).order_by(User.created_at).all()
+
+
+def get_all_roles():
+    return Role.query.all()
 
 
 def create_user(user_dto: UserDto):
