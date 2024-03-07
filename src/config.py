@@ -27,6 +27,7 @@ class BaseConfig(object):
     SECURITY_REGISTERABLE = True
     SECURITY_RECOVERABLE = True
     SECURITY_CONFIRMABLE = True
+    SECURITY_CHANGEABLE = True
     REMEMBER_COOKIE_SAMESITE = "strict"
     SESSION_COOKIE_SAMESITE = "strict"
     # flask-mail
