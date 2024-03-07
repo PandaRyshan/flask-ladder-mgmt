@@ -1,4 +1,3 @@
-from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.sqla.fields import QuerySelectMultipleField
 from flask_admin.actions import action
@@ -8,15 +7,6 @@ from flask_security import current_user, admin_change_password
 from src.models.role import Role
 from src.models.user import User
 from src.contants import ADMIN
-
-
-class IndexViews(AdminIndexView):
-
-    @expose("/")
-    @auth_required()
-    @roles_required(ADMIN)
-    def index(self):
-        return self.render("admin/index.html")
 
 
 class UserView(ModelView):

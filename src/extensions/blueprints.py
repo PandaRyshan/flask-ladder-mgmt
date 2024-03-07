@@ -1,6 +1,6 @@
 from flask import Flask, redirect, render_template,  url_for
 from flask_security import auth_required
-from src.views.user import bp as user_bp
+from src.views.user.user import bp as user_bp
 # from src.views.admin import bp as admin_bp
 
 
