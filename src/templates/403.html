@@ -5,7 +5,8 @@
 {% block content %}
 
 <div class="notification-card">
-    Permission Denied. Please contact the administrator. <a href="mailto:{{ admin_email }}"></a>
+    Permission Denied. Please contact the <a href="mailto:{{ admin_email }}">administrator. </a>
+    Back to <a href="{{ url_for('index') }}">Home Page.</a>
 </div>
 
 {% endblock %}

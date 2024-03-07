@@ -1,7 +1,10 @@
 from flask import Flask
 from flask_admin import Admin
 from src.models.user import User
-from src.views.admin import IndexViews, UserView
+from src.models.server import Server
+from src.views.admin.index import IndexView
+from src.views.admin.dashboard import DashboardView
+from src.views.admin.user import UserView
 from src.extensions.db import db
 
 
@@ -12,7 +15,7 @@ def init(app: Flask):
         app=app,
         name="Admin",
         template_mode="bootstrap4",
-        index_view=IndexViews(),
+        index_view=IndexView(),
         url="/admin/"
     )
 
