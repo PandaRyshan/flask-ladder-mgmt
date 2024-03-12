@@ -11,6 +11,7 @@ authors = [{name = "Xiaohong", email = "xiaohong@pandas.run"}]
 license = {text = "BSD-3-Clause"}
 requires-python = ">=3.10"
 dependencies = [
+    "requests==2.31.0",
     "Jinja2==3.1.2",
     "Werkzeug==3.0.1",
     "Flask==3.0.2",
