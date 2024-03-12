@@ -2,11 +2,11 @@ import uuid
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr
-from src.dto.role_dto import RoleDto
+from src.dto.role_dto import RoleDTO
 from src.contants import RoleEnum
 
 
-class UserDto(BaseModel):
+class UserDTO(BaseModel):
     """
     Data Transfer Object (DTO) for representing a user.
 
@@ -32,7 +32,7 @@ class UserDto(BaseModel):
     # is_verified: Optional[bool] = False
     # is_authenticated: Optional[bool] = False
     # is_anonymous: Optional[bool] = True
-    roles: Optional[list[RoleDto]] = [RoleDto(
+    roles: Optional[list[RoleDTO]] = [RoleDTO(
         id=RoleEnum.USER.value, name=RoleEnum.USER.name)]
     fs_uniquifier: Optional[str] = uuid.uuid4().hex
     created_at: Optional[datetime] = datetime.now()
