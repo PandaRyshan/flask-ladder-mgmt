@@ -1,9 +1,7 @@
 from flask import Flask
 from flask_admin import Admin
 from src.models.user import User
-from src.models.server import Server
 from src.views.admin.index import IndexView
-from src.views.admin.dashboard import DashboardView
 from src.views.admin.user import UserView
 from src.extensions.db import db
 

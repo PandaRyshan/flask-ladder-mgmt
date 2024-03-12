@@ -3,7 +3,7 @@ from flask import Blueprint, redirect, render_template, request, \
 from flask_security import login_user, logout_user, current_user, login_required
 from services import user_service
 from werkzeug.security import generate_password_hash, check_password_hash
-from src.dto.user_dto import UserDto
+from src.dto.user_dto import UserDTO
 from src.models.user import User
 from src.forms.auth_form import SignupForm, SigninForm
 
@@ -16,7 +16,7 @@ def register():
     form = SignupForm()
     if request.method == "POST":
         if form.validate_on_submit():
-            user = UserDto(
+            user = UserDTO(
                 email=form.email.data,
                 password=generate_password_hash(form.password.data),
                 name=form.name.data,

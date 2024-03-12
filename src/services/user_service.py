@@ -1,7 +1,7 @@
 from flask import current_app
 from src.models.user import User
 from src.models.role import Role
-from src.dto.user_dto import UserDto
+from src.dto.user_dto import UserDTO
 from src.extensions.db import db
 from sqlalchemy.orm import joinedload
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
@@ -15,7 +15,7 @@ def get_all_roles():
     return Role.query.all()
 
 
-def create_user(user_dto: UserDto):
+def create_user(user_dto: UserDTO):
     role_ids = [role_dto.id for role_dto in user_dto.roles]
     user = User(
         name=user_dto.name,
