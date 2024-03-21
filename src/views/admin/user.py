@@ -2,7 +2,6 @@ from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.sqla.fields import QuerySelectMultipleField
 from flask_admin.actions import action
 from flask_admin.model.template import LinkRowAction
-from flask_security.decorators import roles_required, auth_required
 from flask_security import current_user, admin_change_password
 from src.models.role import Role
 from src.models.user import User

@@ -21,10 +21,11 @@ class IndexView(AdminIndexView):
         cpu_usage = ServerService().get_cpu_usage(ip)
         ram_usage = ServerService().get_memory_usage(ip)
         disk_usage = ServerService().get_disk_usage(ip)
+        bandwidth_usage = ServerService().get_bandwidth_usage(ip)
         result = {
             "cpu": cpu_usage.get(ip),
             "ram": ram_usage.get(ip),
-            "disk": disk_usage.get(ip)
+            "disk": disk_usage.get(ip),
+            "bandwidth": bandwidth_usage.get(ip)
         }
-        print("result: ", result)
         return result

@@ -26,33 +26,33 @@ class ServerService:
 
 
     def get_disk_usage(self, ip: str):
-        cpu_usages = requests.get(
+        disk_usages = requests.get(
             "http://localhost:9090/api/v1/query",
             params={"query": f"100 - (node_filesystem_avail_bytes{{instance='{ip}:9100', mountpoint='/etc/hostname'}} / node_filesystem_size_bytes{{instance='{ip}:9100', mountpoint='/etc/hostname'}} * 100)"}
         ).json().get("data").get("result")
-        cpu_usage_dict = {}
-        for usage in cpu_usages:
-            cpu_usage_dict[ip] = usage.get("value")[1]
-        return cpu_usage_dict
+        disk_usage_dict = {}
+        for usage in disk_usages:
+            disk_usage_dict[ip] = usage.get("value")[1]
+        return disk_usage_dict
 
 
     def get_memory_usage(self, ip: str):
-        cpu_usages = requests.get(
+        memory_usages = requests.get(
             "http://localhost:9090/api/v1/query",
             params={"query": f"((node_memory_MemTotal_bytes{{instance='{ip}:9100'}} - node_memory_MemAvailable_bytes{{instance='{ip}:9100'}}) / node_memory_MemTotal_bytes{{instance='{ip}:9100'}}) * 100"}
         ).json().get("data").get("result")
-        cpu_usage_dict = {}
-        for usage in cpu_usages:
-            cpu_usage_dict[ip] = usage.get("value")[1]
-        return cpu_usage_dict
+        memory_usage_dict = {}
+        for usage in memory_usages:
+            memory_usage_dict[ip] = usage.get("value")[1]
+        return memory_usage_dict
 
 
     def get_bandwidth_usage(self, ip: str):
-        cpu_usages = requests.get(
+        bandwidth_usages = requests.get(
             "http://localhost:9090/api/v1/query",
             params={"query": f"irate(node_network_transmit_bytes_total{{instance='{ip}:9100'}}[5m]) / 1024 / 1024"}
         ).json().get("data").get("result")
-        cpu_usage_dict = {}
-        for usage in cpu_usages:
-            cpu_usage_dict[ip] = usage.get("value")[1]
-        return cpu_usage_dict
+        bandwidth_usage_dict = {}
+        for usage in bandwidth_usages:
+            bandwidth_usage_dict[ip] = usage.get("value")[1]
+        return bandwidth_usage_dict
