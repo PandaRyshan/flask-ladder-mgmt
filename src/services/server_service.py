@@ -56,3 +56,6 @@ class ServerService:
         for usage in bandwidth_usages:
             bandwidth_usage_dict[ip] = usage.get("value")[1]
         return bandwidth_usage_dict
+
+    def upgrade_server(self, id: int):
+        pass

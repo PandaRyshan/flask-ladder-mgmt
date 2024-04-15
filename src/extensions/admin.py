@@ -1,8 +1,9 @@
 from flask import Flask
 from flask_admin import Admin
 from src.models.user import User
-from src.views.admin.index import IndexView
+from src.models.server import Server
 from src.views.admin.user import UserView
+from src.views.admin.server import ServerView
 from src.extensions.db import db
 
 
@@ -13,7 +14,7 @@ def init(app: Flask):
         app=app,
         name="Admin",
         template_mode="bootstrap4",
-        index_view=IndexView(),
+        # index_view=,
         url="/admin/"
     )
 
@@ -25,5 +26,16 @@ def init(app: Flask):
             endpoint="users",
             menu_icon_type="glyph",
             menu_icon_value="glyphicon-user"
+        )
+    )
+
+    admin.add_view(
+        ServerView(
+            model=Server,
+            session=db.session,
+            name="Servers",
+            endpoint="servers",
+            menu_icon_type="glyph",
+            menu_icon_value="glyphicon-hdd"
         )
     )

@@ -56,7 +56,7 @@
       $('tbody tr').each(function() {
         var row = $(this);
         var ip = row.find('td[name="ip_address"]').text();
-        $.get('/admin/node_usage/' + ip + '/', function(data) {
+        $.get('/admin/servers/node_usage/' + ip + '/', function(data) {
           row.find('div[name="cpu_usage"]').attr({
             'class': 'progress-bar progress-bar-striped',
             'role': 'progressbar',
