@@ -17,7 +17,7 @@ def validate_invite_code(form, field):
         raise validators.ValidationError("Invalid invite code.")
     if code.used:
         raise validators.ValidationError("Invite code has been used.")
-    if code.expires_at < datetime.utcnow():
+    if code.expires_at < datetime.now():
         raise validators.ValidationError("Invite code has expired.")
 
 
