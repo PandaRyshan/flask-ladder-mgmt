@@ -19,7 +19,7 @@ dependencies = [
     "Flask-Login==0.6.3",
     "Flask-WTF==1.2.2",
     "Flask-Admin==1.6.1",
-    "Flask-Security-Too==5.6.0",
+    "Flask-Security-Too[fsqla,mfa,common]==5.6.0",
     "Flask-Caching==2.3.0",
     "Flask-Mailman==1.1.1",
     "Flask-Session==0.8.0",
@@ -35,13 +35,14 @@ dependencies = [
     "setuptools==75.8.0",
     "wheel==0.45.1",
     "itsdangerous==2.2.0",
-    "python-dotenv==1.0.1"
+    "python-dotenv==1.0.1",
+    "pydantic==2.10.6"
 ]
 
 [project.optional-dependencies]
 dev = [
     "ruff==0.9.6",
-    "ipython==8.17.2",
+    "ipython",
     "ipdb"
 ]
 test = [
