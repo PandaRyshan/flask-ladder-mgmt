@@ -5,7 +5,7 @@ from src.models.verification_code import VerificationCode
 from src.models.user import User
 
 
-PASSWORD_REGEX = "(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+"
+PASSWORD_REGEX = r"(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+"
 PASSWORD_INVALID_MESSAGE = "Password must be at least 8 characters long and \
                             contain at least one letter and one number"
 
@@ -24,7 +24,7 @@ class SignupForm(FlaskForm):
             raise validators.ValidationError("Invalid invite code.")
         if code.used:
             raise validators.ValidationError("Invite code has been used.")
-        if code.expires_at < datetime.utcnow():
+        if code.expires_at < datetime.now():
             raise validators.ValidationError("Invite code has expired.")
         
 
