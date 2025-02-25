@@ -52,7 +52,7 @@ def init_db_command(drop):
         name="admin",
         email="admin@local.host",
         username="admin@local.host",
-        password=hash_password("admin"),
+        password=hash_password("admin-test"),
         fs_uniquifier=uuid.uuid4().hex,
         roles=[Role(id=1, name="ADMIN"), Role(id=2, name="USER")],
         confirmed_at=datetime.now()
